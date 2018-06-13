@@ -1,0 +1,178 @@
+entity PrTaxBase {
+	id Integer required,
+    code String required,
+    name String required,
+    description String,
+}
+entity PrTaxLink {
+	id Integer required,
+    code String required,
+    name String required,
+    description String,
+}
+entity PrTypeOfTaxes {
+	id Integer required,
+    code String required,
+    name String required,
+    description String,
+}
+entity PrTaxLevelPayments {
+	id Integer required,
+    code String required,
+    name String required,
+    description String,
+}
+entity PrSuspensions {
+	id Integer required,
+    code String required,
+    name String required,
+    description String,
+}
+entity PrSuspensionTypes {
+	id Integer required,
+    code String required,
+    name String required,
+    description String,
+}
+entity PrSalaryTypes {
+	id Integer required,
+    code String required,
+    name String required,
+    description String,
+}
+entity PrSalaryItems {
+	id Integer required,
+    code String,
+    name String required,
+    description String,
+    taxable String,
+    base Double,
+    percentagePayment String,
+    mipNumber Integer,
+    absenceTypeId Integer,
+    status String
+}
+entity PrPayrollSettings {
+	id Integer required,
+    year Integer required,
+    month Integer required,
+    calculationNumber Integer required,
+    paymentDate LocalDate,
+    calculationDate LocalDate,
+    numberOfWorkingDays Integer,
+    numberOfWOrkingHourse Integer,
+    calculated String,
+    paid String,
+    companyId Integer
+}
+
+entity PrTaxes {
+	id Integer required,
+    code String required,
+    name String required,
+    description String,
+    base Double,
+    status String,
+    typeOfIncome String
+}
+
+entity PrEmployeeSuspensions {
+	id Integer required,
+    creditorId Integer,
+    employeeId Integer required,
+    accountNumber String,
+    totalDebt Double,
+    restDebt Double,
+    amountPartDebt Double,
+    totalNumberOfParts Integer,
+    restNumberOfParts Integer,
+    status String,
+    description String,
+    dateFrom LocalDate,
+    dateTo LocalDate
+}
+entity PrEmpSalaryTaxItems {
+	id Integer required,
+    amount Double,
+    taxBase Integer,
+    typeOfIncome String,
+    taxRegionId Integer
+}
+
+entity PrEmpSalarySuspItems {
+	id Integer required,
+    amount Double,
+    restDebt Integer,
+    partNumber Integer,
+    restNumberOfParts Integer
+}
+entity PrEmpSalarySettings {
+	id Integer required,
+   	year Integer required,
+    month Integer required,
+    calculationNumber Integer required,
+    employeeId Integer required,
+    amount Double,
+    numberOfHours Integer,
+    numberOfDays Integer,
+    hourlyRate Double,
+    standardHourlyRate Double
+}
+entity PrEmpSalaryItems {
+	id Integer required,
+    amount Double,
+    numberOfHours Integer,
+    numberOfDays Integer,
+    hourlyRate Double,
+    standardHourlyRate Double
+}
+entity PrEmpSalaries {
+	id Integer required,
+    year Integer required,
+    month Integer required,
+    calculationNumber Integer required,
+    employeeId Integer required,
+    grossAmount Double,
+    netAmount Double,
+    taxRelief Double,
+    taxBaseAmount Double,
+    paymentAmount Double,
+    totalDays Integer,
+    totalHours Integer,
+    numberOfWorkingDays Integer,
+    numberOfWorkingHours Integer,
+    organizationId Integer,
+    workPlaceId Integer,
+    contractTypeId Integer,
+    employeeResidenceId Integer,
+    contractSalaryAmount Double,
+    contractSalaryCoefficient Double,
+    contractWorkHistoryCoeff Double,
+    yearsOfExperience Integer
+}
+
+relationship OneToOne {
+    PrTaxes{taxBase(name)} to PrTaxBase
+	PrTaxes{taxLevel(name)} to PrTaxLevelPayments
+    PrTaxes{taxType(name)} to PrTypeOfTaxes
+    PrTaxes{taxLink(name)} to PrTaxLink
+    PrPayrollSettings{salaryType(name)} to PrSalaryTypes
+	PrEmployeeSuspensions{suspension(name)} to PrSuspensions
+    PrEmployeeSuspensions{suspensionType(name)} to PrSuspensionTypes
+	PrEmpSalaryTaxItems{employeeSalary} to PrEmpSalaries 
+	PrEmpSalaryTaxItems{tax(name)} to PrTaxes 
+	PrEmpSalaryTaxItems{taxLink(name)} to PrTaxLink 
+	PrEmpSalarySuspItems{employeeSalary} to PrEmpSalaries
+	PrEmpSalarySuspItems{empSuspension} to PrEmployeeSuspensions 
+	PrEmpSalarySettings{salaryType(name)} to PrSalaryTypes 
+    PrEmpSalarySettings{payrollSettings} to PrPayrollSettings
+    PrEmpSalarySettings{salaryItem} to PrSalaryItems
+	PrEmpSalaryItems{employeeSalary} to PrEmpSalaries
+    PrEmpSalaryItems{salaryItem(name)} to PrSalaryItems
+	PrEmpSalaries{payrollSettings} to PrPayrollSettings
+    PrEmpSalaries{salaryType(name)} to PrSalaryTypes
+}
+
+paginate * with pagination
+dto * with mapstruct
+
