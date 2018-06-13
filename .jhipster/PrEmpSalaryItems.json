@@ -1,0 +1,66 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "employeeSalary",
+            "otherEntityName": "prEmpSalaries",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prEmpSalaryItems"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "salaryItem",
+            "otherEntityName": "prSalaryItems",
+            "otherEntityField": "name",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prEmpSalaryItems"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "amount",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "numberOfHours",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "numberOfDays",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "hourlyRate",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "standardHourlyRate",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "createdBy",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "createdAt",
+            "fieldType": "Instant"
+        },
+        {
+            "fieldName": "updatedBy",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "updatedAt",
+            "fieldType": "Instant"
+        }
+    ],
+    "changelogDate": "20180613142217",
+    "entityTableName": "pr_emp_salary_items",
+    "dto": "mapstruct",
+    "pagination": "pagination",
+    "service": "no",
+    "jpaMetamodelFiltering": false,
+    "microserviceName": "hcmPrMicroservice"
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <!--
+        Added the constraints for entity PrEmpSalarySuspItems.
+    -->
+    <changeSet id="20180613142215-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="employee_salary_id"
+                                 baseTableName="pr_e_s_s_i"
+                                 constraintName="pr_emp_salary_employee_sala_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="pr_emp_salaries"/>
+
+        <addForeignKeyConstraint baseColumnNames="emp_suspension_id"
+                                 baseTableName="pr_e_s_s_i"
+                                 constraintName="pr_emp_salary_emp_suspensio_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="pr_employee_suspensions"/>
+
+    </changeSet>
+</databaseChangeLog>

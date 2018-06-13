@@ -1,0 +1,97 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "suspension",
+            "otherEntityName": "prSuspensions",
+            "otherEntityField": "name",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prEmployeeSuspensions"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "suspensionType",
+            "otherEntityName": "prSuspensionTypes",
+            "otherEntityField": "name",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prEmployeeSuspensions"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "creditorId",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "employeeId",
+            "fieldType": "Integer",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "accountNumber",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "totalDebt",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "restDebt",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "amountPartDebt",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "totalNumberOfParts",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "restNumberOfParts",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "status",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "description",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "dateFrom",
+            "fieldType": "LocalDate"
+        },
+        {
+            "fieldName": "dateTo",
+            "fieldType": "LocalDate"
+        },
+        {
+            "fieldName": "createdBy",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "createdAt",
+            "fieldType": "Instant"
+        },
+        {
+            "fieldName": "updatedBy",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "updatedAt",
+            "fieldType": "Instant"
+        }
+    ],
+    "changelogDate": "20180613142213",
+    "entityTableName": "pr_employee_suspensions",
+    "dto": "mapstruct",
+    "pagination": "pagination",
+    "service": "no",
+    "jpaMetamodelFiltering": false,
+    "microserviceName": "hcmPrMicroservice"
+}

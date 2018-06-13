@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <!--
+        Added the constraints for entity AtJobApplicantHistory.
+    -->
+    <changeSet id="20180607092342-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="id_status_from_id"
+                                 baseTableName="ajah"
+                                 constraintName="at_job_applica_id_status_fro_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="at_job_application_statuses"/>
+
+        <addForeignKeyConstraint baseColumnNames="id_status_to_id"
+                                 baseTableName="ajah"
+                                 constraintName="at_job_applica_id_status_to_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="at_job_application_statuses"/>
+
+        <addForeignKeyConstraint baseColumnNames="id_job_application_id"
+                                 baseTableName="ajah"
+                                 constraintName="at_job_applica_id_job_applic_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="at_job_applications"/>
+
+    </changeSet>
+</databaseChangeLog>

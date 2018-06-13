@@ -1,0 +1,92 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "taxBase",
+            "otherEntityName": "prTaxBase",
+            "otherEntityField": "name",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prTaxes"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "taxLevel",
+            "otherEntityName": "prTaxLevelPayments",
+            "otherEntityField": "name",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prTaxes"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "taxType",
+            "otherEntityName": "prTypeOfTaxes",
+            "otherEntityField": "name",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prTaxes"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "taxLink",
+            "otherEntityName": "prTaxLink",
+            "otherEntityField": "name",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prTaxes"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "code",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "name",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "description",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "base",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "status",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "typeOfIncome",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "createdBy",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "createdAt",
+            "fieldType": "Instant"
+        },
+        {
+            "fieldName": "updatedBy",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "updatedAt",
+            "fieldType": "Instant"
+        }
+    ],
+    "changelogDate": "20180613142212",
+    "entityTableName": "pr_taxes",
+    "dto": "mapstruct",
+    "pagination": "pagination",
+    "service": "no",
+    "jpaMetamodelFiltering": false,
+    "microserviceName": "hcmPrMicroservice"
+}

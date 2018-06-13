@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <!--
+        Added the constraints for entity PrEmpSalaryItems.
+    -->
+    <changeSet id="20180613142217-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="employee_salary_id"
+                                 baseTableName="pr_e_s_i"
+                                 constraintName="pr_emp_salary_employee_sala_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="pr_emp_salaries"/>
+
+        <addForeignKeyConstraint baseColumnNames="salary_item_id"
+                                 baseTableName="pr_e_s_i"
+                                 constraintName="pr_emp_salary_salary_item_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="pr_salary_items"/>
+
+    </changeSet>
+</databaseChangeLog>

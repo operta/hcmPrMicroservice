@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <!--
+        Added the constraints for entity PrEmployeeSuspensions.
+    -->
+    <changeSet id="20180613142213-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="suspension_id"
+                                 baseTableName="pr_e_s"
+                                 constraintName="pr_employee_su_suspension_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="pr_suspensions"/>
+
+        <addForeignKeyConstraint baseColumnNames="suspension_type_id"
+                                 baseTableName="pr_e_s"
+                                 constraintName="pr_employee_su_suspension_ty_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="pr_suspension_types"/>
+
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,142 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "payrollSettings",
+            "otherEntityName": "prPayrollSettings",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prEmpSalaries"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "salaryType",
+            "otherEntityName": "prSalaryTypes",
+            "otherEntityField": "name",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prEmpSalaries"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "year",
+            "fieldType": "Integer",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "month",
+            "fieldType": "Integer",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "calculationNumber",
+            "fieldType": "Integer",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "employeeId",
+            "fieldType": "Integer",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "grossAmount",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "netAmount",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "taxRelief",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "taxBaseAmount",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "paymentAmount",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "totalDays",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "totalHours",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "numberOfWorkingDays",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "numberOfWorkingHours",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "organizationId",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "workPlaceId",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "contractTypeId",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "employeeResidenceId",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "contractSalaryAmount",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "contractSalaryCoefficient",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "contractWorkHistoryCoeff",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "yearsOfExperience",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "createdBy",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "createdAt",
+            "fieldType": "Instant"
+        },
+        {
+            "fieldName": "updatedBy",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "updatedAt",
+            "fieldType": "Instant"
+        }
+    ],
+    "changelogDate": "20180613142218",
+    "entityTableName": "pr_emp_salaries",
+    "dto": "mapstruct",
+    "pagination": "pagination",
+    "service": "no",
+    "jpaMetamodelFiltering": false,
+    "microserviceName": "hcmPrMicroservice"
+}

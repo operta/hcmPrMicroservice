@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <property name="now" value="now()" dbms="h2"/>
+
+    <property name="now" value="sysdate" dbms="oracle"/>
+
+    <property name="floatType" value="float4" dbms="postgresql, h2"/>
+    <property name="floatType" value="float" dbms="mysql, oracle, mssql"/>
+
+    <!--
+        Added the entity PrEmpSalaries.
+    -->
+    <changeSet id="20180613142218-1" author="jhipster">
+        <createTable tableName="pr_e_sal">
+            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="jhi_year" type="integer">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="month" type="integer">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="calculation_number" type="integer">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="employee_id" type="integer">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="gross_amount" type="double">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="net_amount" type="double">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="tax_relief" type="double">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="tax_base_amount" type="double">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="payment_amount" type="double">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="total_days" type="integer">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="total_hours" type="integer">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="number_of_working_days" type="integer">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="number_of_working_hours" type="integer">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="organization_id" type="integer">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="work_place_id" type="integer">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="contract_type_id" type="integer">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="employee_residence_id" type="integer">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="contract_salary_amount" type="double">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="contract_salary_coefficient" type="double">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="contract_work_history_coeff" type="double">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="years_of_experience" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="payroll_settings_id" type="bigint">
+                <constraints unique="true" nullable="true" />
+            </column>            <column name="salary_type_id" type="bigint">
+                <constraints unique="true" nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
+        </createTable>
+        
+    </changeSet>
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here, do not remove-->
+</databaseChangeLog>

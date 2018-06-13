@@ -1,0 +1,62 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "employeeSalary",
+            "otherEntityName": "prEmpSalaries",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prEmpSalarySuspItems"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "empSuspension",
+            "otherEntityName": "prEmployeeSuspensions",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prEmpSalarySuspItems"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "amount",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "restDebt",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "partNumber",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "restNumberOfParts",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "createdBy",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "createdAt",
+            "fieldType": "Instant"
+        },
+        {
+            "fieldName": "updatedBy",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "updatedAt",
+            "fieldType": "Instant"
+        }
+    ],
+    "changelogDate": "20180613142215",
+    "entityTableName": "pr_emp_salary_susp_items",
+    "dto": "mapstruct",
+    "pagination": "pagination",
+    "service": "no",
+    "jpaMetamodelFiltering": false,
+    "microserviceName": "hcmPrMicroservice"
+}

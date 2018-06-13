@@ -1,0 +1,70 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "employeeSalary",
+            "otherEntityName": "prEmpSalaries",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prEmpSalaryTaxItems"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "tax",
+            "otherEntityName": "prTaxes",
+            "otherEntityField": "name",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prEmpSalaryTaxItems"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "taxLink",
+            "otherEntityName": "prTaxLink",
+            "otherEntityField": "name",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prEmpSalaryTaxItems"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "amount",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "taxBase",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "typeOfIncome",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "taxRegionId",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "createdBy",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "createdAt",
+            "fieldType": "Instant"
+        },
+        {
+            "fieldName": "updatedBy",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "updatedAt",
+            "fieldType": "Instant"
+        }
+    ],
+    "changelogDate": "20180613142214",
+    "entityTableName": "pr_emp_salary_tax_items",
+    "dto": "mapstruct",
+    "pagination": "pagination",
+    "service": "no",
+    "jpaMetamodelFiltering": false,
+    "microserviceName": "hcmPrMicroservice"
+}

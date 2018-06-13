@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <!--
+        Added the constraints for entity AtApplicantAcc.
+    -->
+    <changeSet id="20180607092336-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="id_accomplishment_type_id"
+                                 baseTableName="aaa"
+                                 constraintName="at_applicant_a_id_accomplish_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="at_accomplishment_types"/>
+
+        <addForeignKeyConstraint baseColumnNames="id_applicant_id"
+                                 baseTableName="aaa"
+                                 constraintName="at_applicant_a_id_applicant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="at_applicants"/>
+
+    </changeSet>
+</databaseChangeLog>
