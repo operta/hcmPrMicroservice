@@ -123,6 +123,25 @@ public class PrEmpSalariesResource {
     }
 
     /**
+     * GET  /pr-emp-salaries/employee/:employeeId/payroll/:payrollId : get emp salary by emp and payroll
+     *
+     * @param employeeId the id of employee
+     * @param payrollId the id of payroll
+     * @return the ResponseEntity with status 200 (OK) and with body the prEmpSalariesDTO, or with status 404 (Not Found)
+     */
+    @GetMapping("/pr-emp-salaries/employee/{employeeId}/payroll/{payrollId}")
+    @Timed
+    public ResponseEntity<PrEmpSalariesDTO> getEmpSalariesByEmployeeAndPayroll(
+        @PathVariable Integer employeeId,
+        @PathVariable Integer payrollId
+    ) {
+        log.debug("REST request to get PrEmpSalaries by empId and payrollId : {}", employeeId);
+        PrEmpSalaries prEmpSalaries = prEmpSalariesRepository.findByEmployeeIdAndPayrollSettingsId(employeeId, payrollId.longValue());
+        PrEmpSalariesDTO prEmpSalariesDTO = prEmpSalariesMapper.toDto(prEmpSalaries);
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(prEmpSalariesDTO));
+    }
+
+    /**
      * DELETE  /pr-emp-salaries/:id : delete the "id" prEmpSalaries.
      *
      * @param id the id of the prEmpSalariesDTO to delete
