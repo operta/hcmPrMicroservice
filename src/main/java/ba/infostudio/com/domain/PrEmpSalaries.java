@@ -64,7 +64,7 @@ public class PrEmpSalaries extends AbstractAuditingEntity implements Serializabl
     @Column(name = "number_of_working_days")
     private Integer numberOfWorkingDays;
 
-    @Column(name = "number_of_working_hours")
+    @Column(name = "number_of_workig_hours")
     private Integer numberOfWorkingHours;
 
     @Column(name = "organization_id")
@@ -88,7 +88,7 @@ public class PrEmpSalaries extends AbstractAuditingEntity implements Serializabl
     @Column(name = "contract_work_history_coeff")
     private Double contractWorkHistoryCoeff;
 
-    @Column(name = "years_of_experience")
+    @Column(name = "years_of_expirience")
     private Integer yearsOfExperience;
 
     @OneToOne

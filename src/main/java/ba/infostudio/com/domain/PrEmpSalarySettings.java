@@ -52,7 +52,7 @@ public class PrEmpSalarySettings implements Serializable {
     @Column(name = "hourly_rate")
     private Double hourlyRate;
 
-    @Column(name = "standard_hourly_rate")
+    @Column(name = "standard_horly_rate")
     private Double standardHourlyRate;
 
     @OneToOne
