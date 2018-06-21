@@ -13,6 +13,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,9 +23,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * REST controller for managing PrPayrollSettings.
@@ -100,11 +104,50 @@ public class PrPayrollSettingsResource {
      */
     @GetMapping("/pr-payroll-settings")
     @Timed
-    public ResponseEntity<List<PrPayrollSettingsDTO>> getAllPrPayrollSettings(Pageable pageable) {
+    public ResponseEntity<List<PrPayrollSettingsDTO>> getAllPrPayrollSettings(
+        Pageable pageable,
+        @RequestParam(value = "month", required = false) Integer month,
+        @RequestParam(value = "year", required = false) Integer year,
+        @RequestParam(value = "salaryTypeId", required = false) Integer salaryTypeId
+        ) {
         log.debug("REST request to get a page of PrPayrollSettings");
-        Page<PrPayrollSettings> page = prPayrollSettingsRepository.findAll(pageable);
+
+        Set<Integer> ids = new HashSet<Integer>(Arrays.asList(extractIds(prPayrollSettingsRepository.findAll())));
+
+        if(month != null && year != null) {
+            List<PrPayrollSettings> list = prPayrollSettingsRepository.findByMonthAndYear(month, year);
+            Set<Integer> s = new HashSet<Integer>(Arrays.asList(extractIds(list)));
+            ids.retainAll(s);
+        }
+        if(salaryTypeId != null) {
+            List<PrPayrollSettings> list = prPayrollSettingsRepository.findBySalaryTypeId(salaryTypeId.longValue());
+            Set<Integer> s = new HashSet<Integer>(Arrays.asList(extractIds(list)));
+            ids.retainAll(s);
+        }
+
+        Integer[] result = ids.toArray(new Integer[ids.size()]);
+
+        List<PrPayrollSettings> payrolls = new ArrayList<PrPayrollSettings>();
+        for(int i = 0; i < result.length; i++) {
+            PrPayrollSettings item = prPayrollSettingsRepository.findOne(result[i].longValue());
+            payrolls.add(item);
+        }
+
+        Page<PrPayrollSettings> page = new PageImpl<PrPayrollSettings>(payrolls, pageable, payrolls.size());
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/pr-payroll-settings");
         return new ResponseEntity<>(prPayrollSettingsMapper.toDto(page.getContent()), headers, HttpStatus.OK);
+    }
+
+
+    public static Integer[] extractIds(List<PrPayrollSettings> array) {
+        if(array.size() == 0) {
+            return new Integer[0];
+        }
+        Integer[] result = new Integer[array.size()];
+        for(int i = 0; i < array.size(); i++) {
+            result[i] = (array.get(i).getId().intValue());
+        }
+        return result;
     }
 
     /**
