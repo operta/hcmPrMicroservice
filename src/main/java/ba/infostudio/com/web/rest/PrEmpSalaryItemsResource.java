@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,6 +104,24 @@ public class PrEmpSalaryItemsResource {
         Page<PrEmpSalaryItems> page = prEmpSalaryItemsRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/pr-emp-salary-items");
         return new ResponseEntity<>(prEmpSalaryItemsMapper.toDto(page.getContent()), headers, HttpStatus.OK);
+    }
+
+        /**
+     * GET  /pr-emp-salary-items : get all the prEmpSalaryItems. by emp salary
+     *
+     * @param id the id of emp salary
+     * @return the ResponseEntity with status 200 (OK) and the list of prEmpSalaryItems in body
+     */
+    @GetMapping("/pr-emp-salary-items/salary/{id}")
+    @Timed
+    public ResponseEntity<List<PrEmpSalaryItemsDTO>> getSalaryItemsBySalaryId(@PathVariable Integer id) {
+        log.debug("REST request to get a page of PrEmpSalaryItems");
+        List<PrEmpSalaryItems> items = prEmpSalaryItemsRepository.findByEmployeeSalaryId(id.longValue());
+        List<PrEmpSalaryItemsDTO> dtoitems = new ArrayList<PrEmpSalaryItemsDTO>();
+        for (PrEmpSalaryItems item : items) {
+            dtoitems.add(prEmpSalaryItemsMapper.toDto(item));
+        }
+        return new ResponseEntity<>(dtoitems, null, HttpStatus.OK);
     }
 
     /**
