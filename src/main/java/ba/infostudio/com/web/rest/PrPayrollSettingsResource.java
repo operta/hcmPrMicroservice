@@ -127,6 +127,7 @@ public class PrPayrollSettingsResource {
 
         Integer[] result = ids.toArray(new Integer[ids.size()]);
 
+
         List<PrPayrollSettings> payrolls = new ArrayList<PrPayrollSettings>();
         for(int i = 0; i < result.length; i++) {
             PrPayrollSettings item = prPayrollSettingsRepository.findOne(result[i].longValue());
@@ -134,6 +135,7 @@ public class PrPayrollSettingsResource {
         }
 
         Page<PrPayrollSettings> page = new PageImpl<PrPayrollSettings>(payrolls, pageable, payrolls.size());
+
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/pr-payroll-settings");
         return new ResponseEntity<>(prPayrollSettingsMapper.toDto(page.getContent()), headers, HttpStatus.OK);
     }

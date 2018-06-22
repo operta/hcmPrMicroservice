@@ -106,7 +106,7 @@ public class PrEmpSalaryItemsResource {
         return new ResponseEntity<>(prEmpSalaryItemsMapper.toDto(page.getContent()), headers, HttpStatus.OK);
     }
 
-        /**
+    /**
      * GET  /pr-emp-salary-items : get all the prEmpSalaryItems. by emp salary
      *
      * @param id the id of emp salary

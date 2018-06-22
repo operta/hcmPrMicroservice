@@ -141,6 +141,26 @@ public class PrEmpSalariesResource {
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(prEmpSalariesDTO));
     }
 
+        /**
+     * GET  /pr-emp-salaries/check/employee/:employeeId/payroll/:payrollId : get emp salary by emp and payroll
+     *
+     * @param employeeId the id of employee
+     * @param payrollId the id of payroll
+     * @return the ResponseEntity with status 200 (OK) and with body the prEmpSalariesDTO, or with status 404 (Not Found)
+     */
+    @GetMapping("/pr-emp-salaries/check/employee/{employeeId}/payroll/{payrollId}")
+    @Timed
+    public ResponseEntity<PrEmpSalariesDTO> checckEmpSalariesByEmployeeAndPayroll(
+        @PathVariable Integer employeeId,
+        @PathVariable Integer payrollId
+    ) {
+        log.debug("REST request to get PrEmpSalaries by empId and payrollId : {}", employeeId);
+        PrEmpSalaries prEmpSalaries = prEmpSalariesRepository.findByEmployeeIdAndPayrollSettingsId(employeeId, payrollId.longValue());
+        PrEmpSalariesDTO prEmpSalariesDTO = prEmpSalariesMapper.toDto(prEmpSalaries);
+        return new ResponseEntity<PrEmpSalariesDTO>(prEmpSalariesDTO, null, HttpStatus.OK);
+    }
+
+
     /**
      * DELETE  /pr-emp-salaries/:id : delete the "id" prEmpSalaries.
      *
