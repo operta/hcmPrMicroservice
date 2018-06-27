@@ -15,6 +15,7 @@ public interface PrEmpSalarySettingsMapper extends EntityMapper<PrEmpSalarySetti
     @Mapping(source = "salaryType.name", target = "salaryTypeName")
     @Mapping(source = "payrollSettings.id", target = "payrollSettingsId")
     @Mapping(source = "salaryItem.id", target = "salaryItemId")
+    @Mapping(source = "salaryItem.name", target = "salaryItemName")
     PrEmpSalarySettingsDTO toDto(PrEmpSalarySettings prEmpSalarySettings);
 
     @Mapping(source = "salaryTypeId", target = "salaryType")

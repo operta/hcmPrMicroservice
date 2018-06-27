@@ -266,6 +266,7 @@ public class PrEmpSalarySettings implements Serializable {
             ", numberOfDays=" + getNumberOfDays() +
             ", hourlyRate=" + getHourlyRate() +
             ", standardHourlyRate=" + getStandardHourlyRate() +
+            ", salaryItemId = " + getSalaryItem().getId() +
             "}";
     }
 }

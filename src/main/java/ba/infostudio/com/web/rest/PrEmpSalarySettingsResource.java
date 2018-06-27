@@ -1,15 +1,23 @@
 package ba.infostudio.com.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import ba.infostudio.com.domain.PrEmpSalarySettings;
 
+import ba.infostudio.com.domain.EmEmpSalaries;
+import ba.infostudio.com.domain.PrEmpSalarySettings;
+import ba.infostudio.com.domain.PrPayrollSettings;
+import ba.infostudio.com.domain.PrSalaryItems;
+import ba.infostudio.com.repository.EmEmpSalariesRepository;
 import ba.infostudio.com.repository.PrEmpSalarySettingsRepository;
+import ba.infostudio.com.repository.PrPayrollSettingsRepository;
+import ba.infostudio.com.repository.PrSalaryItemsRepository;
 import ba.infostudio.com.web.rest.errors.BadRequestAlertException;
 import ba.infostudio.com.web.rest.util.HeaderUtil;
 import ba.infostudio.com.web.rest.util.PaginationUtil;
 import ba.infostudio.com.service.dto.PrEmpSalarySettingsDTO;
 import ba.infostudio.com.service.mapper.PrEmpSalarySettingsMapper;
 import io.github.jhipster.web.util.ResponseUtil;
+
+import org.dom4j.dom.DOMAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -23,6 +31,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,11 +48,26 @@ public class PrEmpSalarySettingsResource {
 
     private final PrEmpSalarySettingsRepository prEmpSalarySettingsRepository;
 
+    private final EmEmpSalariesRepository salariesRepository;
+
+    private final PrSalaryItemsRepository salaryItemsRepository;
+
+    private final PrPayrollSettingsRepository payrollSettingsRepository;
+
     private final PrEmpSalarySettingsMapper prEmpSalarySettingsMapper;
 
-    public PrEmpSalarySettingsResource(PrEmpSalarySettingsRepository prEmpSalarySettingsRepository, PrEmpSalarySettingsMapper prEmpSalarySettingsMapper) {
+    public PrEmpSalarySettingsResource(
+        PrEmpSalarySettingsRepository prEmpSalarySettingsRepository,
+        PrEmpSalarySettingsMapper prEmpSalarySettingsMapper,
+         EmEmpSalariesRepository salariesRepository,
+         PrSalaryItemsRepository salaryItemsRepository,
+         PrPayrollSettingsRepository payrollSettingsRepository
+    ) {
         this.prEmpSalarySettingsRepository = prEmpSalarySettingsRepository;
         this.prEmpSalarySettingsMapper = prEmpSalarySettingsMapper;
+        this.salariesRepository = salariesRepository;
+        this.salaryItemsRepository = salaryItemsRepository;
+        this.payrollSettingsRepository = payrollSettingsRepository;
     }
 
     /**
@@ -60,13 +84,56 @@ public class PrEmpSalarySettingsResource {
         if (prEmpSalarySettingsDTO.getId() != null) {
             throw new BadRequestAlertException("A new prEmpSalarySettings cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
         PrEmpSalarySettings prEmpSalarySettings = prEmpSalarySettingsMapper.toEntity(prEmpSalarySettingsDTO);
+        log.debug("SETTINGS {}", prEmpSalarySettings);
+
+        PrSalaryItems salaryItem = salaryItemsRepository.findOne(prEmpSalarySettings.getSalaryItem().getId());
+        PrPayrollSettings payrollSettings = payrollSettingsRepository.findOne(prEmpSalarySettings.getPayrollSettings().getId());
+        log.debug("SALARY ITEM {}", salaryItem);
+        log.debug("IS PERCENTAGE PAYMENT {}", salaryItem.getPercentagePayment());
+        if(salaryItem.getPercentagePayment().equals("Y")){
+            log.debug("PERCENTAGE PAYMENT!");
+            prEmpSalarySettings.setAmount(this.generateSalary(prEmpSalarySettings, salaryItem, payrollSettings));
+        }
         prEmpSalarySettings = prEmpSalarySettingsRepository.save(prEmpSalarySettings);
         PrEmpSalarySettingsDTO result = prEmpSalarySettingsMapper.toDto(prEmpSalarySettings);
         return ResponseEntity.created(new URI("/api/pr-emp-salary-settings/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
+
+    private Double generateSalary(PrEmpSalarySettings salarySettings, PrSalaryItems salaryItem, PrPayrollSettings payrollSettings) {
+
+        List<EmEmpSalaries> employeeSalaries = salariesRepository.findByIdEmployeeId(salarySettings.getEmployeeId().longValue());
+        log.debug("EMPLOYEE SALARIES {}", employeeSalaries);
+        if(!employeeSalaries.isEmpty() && employeeSalaries.size() > 0){
+            LocalDate lastMonth = employeeSalaries.get(0).getDateFrom();
+
+            EmEmpSalaries lastSalary = employeeSalaries.get(0);
+            for(int i = 0; i< employeeSalaries.size(); i++){
+                if(employeeSalaries.get(i).getDateFrom().isAfter(lastMonth)){
+                    lastMonth = employeeSalaries.get(i).getDateFrom();
+                    lastSalary = employeeSalaries.get(i);
+                }
+            }
+
+            log.debug("LAST MONTH {}", lastMonth);
+            log.debug("LAST SALARY AMOUNT{}", lastSalary.getSalaryAmount());
+            log.debug("NUMBER OF HOURS {}",    salarySettings.getNumberOfHours() );
+            log.debug("NUMBER OF WORKING HOURS IN MONTH {}", payrollSettings.getNumberOfWorkingHours());
+
+            log.debug("PAYROLL SETTING {}", payrollSettings);
+            log.debug("SALARY ITEM BASE {}",  salaryItem.getBase());
+            Double result = lastSalary.getSalaryAmount().doubleValue() * (salarySettings.getNumberOfHours().doubleValue() / payrollSettings.getNumberOfWorkingHours().doubleValue()) * (salaryItem.getBase().doubleValue() / 100);
+            log.debug("RESULT {}", result);
+            return result;
+        } else {
+            return 0.0;
+        }
+    }
+
+
 
     /**
      * PUT  /pr-emp-salary-settings : Updates an existing prEmpSalarySettings.
@@ -85,6 +152,11 @@ public class PrEmpSalarySettingsResource {
             return createPrEmpSalarySettings(prEmpSalarySettingsDTO);
         }
         PrEmpSalarySettings prEmpSalarySettings = prEmpSalarySettingsMapper.toEntity(prEmpSalarySettingsDTO);
+        PrSalaryItems salaryItem = salaryItemsRepository.findOne(prEmpSalarySettings.getSalaryItem().getId());
+        PrPayrollSettings settings = payrollSettingsRepository.findOne(prEmpSalarySettings.getPayrollSettings().getId());
+        if(salaryItem.getPercentagePayment().equals("Y")){
+            prEmpSalarySettings.setAmount(this.generateSalary(prEmpSalarySettings, salaryItem, settings));
+        }
         prEmpSalarySettings = prEmpSalarySettingsRepository.save(prEmpSalarySettings);
         PrEmpSalarySettingsDTO result = prEmpSalarySettingsMapper.toDto(prEmpSalarySettings);
         return ResponseEntity.ok()
@@ -105,6 +177,45 @@ public class PrEmpSalarySettingsResource {
         Page<PrEmpSalarySettings> page = prEmpSalarySettingsRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/pr-emp-salary-settings");
         return new ResponseEntity<>(prEmpSalarySettingsMapper.toDto(page.getContent()), headers, HttpStatus.OK);
+    }
+
+
+        /**
+     * GET  /pr-emp-salaries/check/employee/:employeeId/payroll/:payrollId : get emp salary by emp and payroll
+     *
+     * @param employeeId the id of employee
+     * @param payrollId the id of payroll
+     * @return the ResponseEntity with status 200 (OK) and with body the prEmpSalariesDTO, or with status 404 (Not Found)
+     */
+    @GetMapping("/pr-emp-salary-settings/check/employee/{employeeId}/payroll/{payrollId}")
+    @Timed
+    public ResponseEntity<PrEmpSalarySettingsDTO> checkEmpSalariesByEmployeeAndPayroll(
+        @PathVariable Integer employeeId,
+        @PathVariable Integer payrollId
+    ) {
+        log.debug("REST request to get PrEmpSalaries by empId and payrollId : {}", employeeId);
+        PrEmpSalarySettings prEmpSalaries = prEmpSalarySettingsRepository.findByEmployeeIdAndPayrollSettingsId(employeeId, payrollId.longValue());
+        PrEmpSalarySettingsDTO prEmpSalariesDTO = prEmpSalarySettingsMapper.toDto(prEmpSalaries);
+        return new ResponseEntity<PrEmpSalarySettingsDTO>(prEmpSalariesDTO, null, HttpStatus.OK);
+    }
+
+        /**
+     * GET  /pr-emp-salary-settings/employee/:employeeId/payroll/:payrollId : get emp salary settings by emp and payroll
+     *
+     * @param employeeId the id of employee
+     * @param payrollId the id of payroll
+     * @return the ResponseEntity with status 200 (OK) and with body the prEmpSalarySettingsDTO, or with status 404 (Not Found)
+     */
+    @GetMapping("/pr-emp-salary-settings/employee/{employeeId}/payroll/{payrollId}")
+    @Timed
+    public ResponseEntity<PrEmpSalarySettingsDTO> getEmpSalariesByEmployeeAndPayroll(
+        @PathVariable Integer employeeId,
+        @PathVariable Integer payrollId
+    ) {
+        log.debug("REST request to get PrEmpSalarySettings by empId and payrollId : {}", employeeId);
+        PrEmpSalarySettings prEmpSalaries = prEmpSalarySettingsRepository.findByEmployeeIdAndPayrollSettingsId(employeeId, payrollId.longValue());
+        PrEmpSalarySettingsDTO prEmpSalariesDTO = prEmpSalarySettingsMapper.toDto(prEmpSalaries);
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(prEmpSalariesDTO));
     }
 
     /**

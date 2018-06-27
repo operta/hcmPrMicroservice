@@ -12,5 +12,5 @@ import org.springframework.data.jpa.repository.*;
 @SuppressWarnings("unused")
 @Repository
 public interface PrEmpSalarySettingsRepository extends JpaRepository<PrEmpSalarySettings, Long> {
-
+    PrEmpSalarySettings findByEmployeeIdAndPayrollSettingsId(Integer id1, Long id2);
 }

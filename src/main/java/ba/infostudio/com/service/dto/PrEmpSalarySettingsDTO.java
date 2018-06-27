@@ -45,6 +45,8 @@ public class PrEmpSalarySettingsDTO implements Serializable {
 
     private Long salaryItemId;
 
+    private String salaryItemName;
+
     private String createdBy;
 
     private Instant createdAt;
@@ -196,6 +198,15 @@ public class PrEmpSalarySettingsDTO implements Serializable {
     public void setSalaryItemId(Long prSalaryItemsId) {
         this.salaryItemId = prSalaryItemsId;
     }
+
+    public String getSalaryItemName() {
+        return salaryItemName;
+    }
+
+    public void setSalaryItemName(String prSalaryTypesName) {
+        this.salaryItemName = prSalaryTypesName;
+    }
+
 
     @Override
     public boolean equals(Object o) {

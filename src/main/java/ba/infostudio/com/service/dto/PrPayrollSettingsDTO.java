@@ -31,7 +31,7 @@ public class PrPayrollSettingsDTO implements Serializable {
 
     private Integer numberOfWorkingDays;
 
-    private Integer numberOfWOrkingHourse;
+    private Integer numberOfWorkingHours;
 
     private String calculated;
 
@@ -139,12 +139,12 @@ public class PrPayrollSettingsDTO implements Serializable {
         this.numberOfWorkingDays = numberOfWorkingDays;
     }
 
-    public Integer getNumberOfWOrkingHourse() {
-        return numberOfWOrkingHourse;
+    public Integer getNumberOfWorkingHours() {
+        return numberOfWorkingHours;
     }
 
-    public void setNumberOfWOrkingHourse(Integer numberOfWOrkingHourse) {
-        this.numberOfWOrkingHourse = numberOfWOrkingHourse;
+    public void setNumberOfWorkingHours(Integer numberOfWOrkingHourse) {
+        this.numberOfWorkingHours = numberOfWOrkingHourse;
     }
 
     public String getCalculated() {
@@ -218,7 +218,6 @@ public class PrPayrollSettingsDTO implements Serializable {
             ", paymentDate='" + getPaymentDate() + "'" +
             ", calculationDate='" + getCalculationDate() + "'" +
             ", numberOfWorkingDays=" + getNumberOfWorkingDays() +
-            ", numberOfWOrkingHourse=" + getNumberOfWOrkingHourse() +
             ", calculated='" + getCalculated() + "'" +
             ", paid='" + getPaid() + "'" +
             ", companyId=" + getCompanyId() +
