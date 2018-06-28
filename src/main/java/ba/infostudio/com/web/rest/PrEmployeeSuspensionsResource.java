@@ -1,5 +1,8 @@
 package ba.infostudio.com.web.rest;
 
+import ba.infostudio.com.domain.EmEmployees;
+import ba.infostudio.com.service.dto.EmEmployeesDTO;
+import ba.infostudio.com.service.mapper.EmEmployeesMapper;
 import com.codahale.metrics.annotation.Timed;
 import ba.infostudio.com.domain.PrEmployeeSuspensions;
 
@@ -40,6 +43,7 @@ public class PrEmployeeSuspensionsResource {
     private final PrEmployeeSuspensionsRepository prEmployeeSuspensionsRepository;
 
     private final PrEmployeeSuspensionsMapper prEmployeeSuspensionsMapper;
+
 
     public PrEmployeeSuspensionsResource(PrEmployeeSuspensionsRepository prEmployeeSuspensionsRepository, PrEmployeeSuspensionsMapper prEmployeeSuspensionsMapper) {
         this.prEmployeeSuspensionsRepository = prEmployeeSuspensionsRepository;
@@ -119,6 +123,22 @@ public class PrEmployeeSuspensionsResource {
         log.debug("REST request to get PrEmployeeSuspensions : {}", id);
         PrEmployeeSuspensions prEmployeeSuspensions = prEmployeeSuspensionsRepository.findOne(id);
         PrEmployeeSuspensionsDTO prEmployeeSuspensionsDTO = prEmployeeSuspensionsMapper.toDto(prEmployeeSuspensions);
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(prEmployeeSuspensionsDTO));
+    }
+
+    /**
+     * GET  /pr-employee-suspensions/employee/:id : get the "id" prEmployeeSuspensions.
+     *
+     * @param id the id of the EmployeeId to retrieve List<PrEmplyeeSuspensionsDTO>
+     * @return the ResponseEntity with status 200 (OK) and with body the List<prEmployeeSuspensionsDTO>, or with status 404 (Not Found)
+     */
+    @GetMapping("/pr-employee-suspensions/employee/{id}")
+    @Timed
+    public ResponseEntity<List<PrEmployeeSuspensionsDTO>> getListOfSuspensionsByEmployeeId(@PathVariable Long id) {
+        log.debug("REST request to get List of Employees : {}", id);
+        List<PrEmployeeSuspensions> prEmployeeSuspensions =
+            prEmployeeSuspensionsRepository.findByEmployeeId(id.intValue());
+        List<PrEmployeeSuspensionsDTO> prEmployeeSuspensionsDTO = prEmployeeSuspensionsMapper.toDto(prEmployeeSuspensions);
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(prEmployeeSuspensionsDTO));
     }
 

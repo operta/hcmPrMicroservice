@@ -234,6 +234,21 @@ public class PrEmpSalarySettingsResource {
     }
 
     /**
+     * GET  /pr-emp-salary-settings/employee/:id : get true or false depending on if there are employees.
+     *
+     * @param id the id of the prEmpSalarySettingsDTO to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the prEmpSalarySettingsDTO, or with status 404 (Not Found)
+     */
+    @GetMapping("/pr-emp-salary-settings/employee/{id}")
+    @Timed
+    public ResponseEntity<Boolean> getIfExistsEmployeeWithDateToNotExpired(@PathVariable Long id) {
+        log.debug("REST request to get if there exists an employee with dateto not expired!");
+        Integer numOfEmpsWithDateToNotExpired =
+            prEmpSalarySettingsRepository.findNumOfEmpsWithDateToNotExpired(id, LocalDate.now());
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(numOfEmpsWithDateToNotExpired > 0));
+    }
+
+    /**
      * DELETE  /pr-emp-salary-settings/:id : delete the "id" prEmpSalarySettings.
      *
      * @param id the id of the prEmpSalarySettingsDTO to delete
