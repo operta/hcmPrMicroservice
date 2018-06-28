@@ -81,10 +81,10 @@ public class PrPayrollSettingsResource {
         final Long payrollSalaryTypeId = prPayrollSettingsDTO.getSalaryTypeId();
         final Integer randomInt = new Random().nextInt(1000000);
 
-        final String calculationNumber = String.format("%d.%d.%d.%d", payrollYear,
-            payrollMonth,
-            payrollSalaryTypeId,
-            randomInt);
+        final String calculationNumber = payrollYear.toString() + '.' +
+            payrollMonth.toString() + '.' +
+            payrollSalaryTypeId.toString() + '.' +
+            randomInt.toString();
         prPayrollSettingsDTO.setCalculationNumber(calculationNumber);
 
 

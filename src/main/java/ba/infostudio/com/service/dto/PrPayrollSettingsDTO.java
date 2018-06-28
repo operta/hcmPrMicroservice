@@ -22,7 +22,6 @@ public class PrPayrollSettingsDTO implements Serializable {
     @NotNull
     private Integer month;
 
-    @NotNull
     private String calculationNumber;
 
     private LocalDate paymentDate;
