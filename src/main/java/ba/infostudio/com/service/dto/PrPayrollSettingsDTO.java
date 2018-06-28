@@ -23,7 +23,7 @@ public class PrPayrollSettingsDTO implements Serializable {
     private Integer month;
 
     @NotNull
-    private Integer calculationNumber;
+    private String calculationNumber;
 
     private LocalDate paymentDate;
 
@@ -107,11 +107,11 @@ public class PrPayrollSettingsDTO implements Serializable {
         this.month = month;
     }
 
-    public Integer getCalculationNumber() {
+    public String getCalculationNumber() {
         return calculationNumber;
     }
 
-    public void setCalculationNumber(Integer calculationNumber) {
+    public void setCalculationNumber(String calculationNumber) {
         this.calculationNumber = calculationNumber;
     }
 
