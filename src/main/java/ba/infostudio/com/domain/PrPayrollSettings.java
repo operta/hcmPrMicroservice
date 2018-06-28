@@ -35,7 +35,7 @@ public class PrPayrollSettings extends AbstractAuditingEntity implements Seriali
 
     @NotNull
     @Column(name = "calculation_number", nullable = false)
-    private Integer calculationNumber;
+    private String calculationNumber;
 
     @Column(name = "payment_date")
     private LocalDate paymentDate;
@@ -97,16 +97,16 @@ public class PrPayrollSettings extends AbstractAuditingEntity implements Seriali
         this.month = month;
     }
 
-    public Integer getCalculationNumber() {
+    public String getCalculationNumber() {
         return calculationNumber;
     }
 
-    public PrPayrollSettings calculationNumber(Integer calculationNumber) {
+    public PrPayrollSettings calculationNumber(String calculationNumber) {
         this.calculationNumber = calculationNumber;
         return this;
     }
 
-    public void setCalculationNumber(Integer calculationNumber) {
+    public void setCalculationNumber(String calculationNumber) {
         this.calculationNumber = calculationNumber;
     }
 

@@ -34,7 +34,7 @@ public class PrEmpSalarySettings implements Serializable {
 
     @NotNull
     @Column(name = "calculation_number", nullable = false)
-    private Integer calculationNumber;
+    private String calculationNumber;
 
     @NotNull
     @Column(name = "employee_id", nullable = false)
@@ -102,16 +102,16 @@ public class PrEmpSalarySettings implements Serializable {
         this.month = month;
     }
 
-    public Integer getCalculationNumber() {
+    public String getCalculationNumber() {
         return calculationNumber;
     }
 
-    public PrEmpSalarySettings calculationNumber(Integer calculationNumber) {
+    public PrEmpSalarySettings calculationNumber(String calculationNumber) {
         this.calculationNumber = calculationNumber;
         return this;
     }
 
-    public void setCalculationNumber(Integer calculationNumber) {
+    public void setCalculationNumber(String calculationNumber) {
         this.calculationNumber = calculationNumber;
     }
 

@@ -34,7 +34,7 @@ public class PrEmpSalaries extends AbstractAuditingEntity implements Serializabl
 
     @NotNull
     @Column(name = "calculation_number", nullable = false)
-    private Integer calculationNumber;
+    private String calculationNumber;
 
     @NotNull
     @Column(name = "employee_id", nullable = false)
@@ -134,16 +134,16 @@ public class PrEmpSalaries extends AbstractAuditingEntity implements Serializabl
         this.month = month;
     }
 
-    public Integer getCalculationNumber() {
+    public String getCalculationNumber() {
         return calculationNumber;
     }
 
-    public PrEmpSalaries calculationNumber(Integer calculationNumber) {
+    public PrEmpSalaries calculationNumber(String calculationNumber) {
         this.calculationNumber = calculationNumber;
         return this;
     }
 
-    public void setCalculationNumber(Integer calculationNumber) {
+    public void setCalculationNumber(String calculationNumber) {
         this.calculationNumber = calculationNumber;
     }
 

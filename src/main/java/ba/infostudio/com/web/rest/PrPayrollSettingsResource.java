@@ -10,6 +10,8 @@ import ba.infostudio.com.web.rest.util.PaginationUtil;
 import ba.infostudio.com.service.dto.PrPayrollSettingsDTO;
 import ba.infostudio.com.service.mapper.PrPayrollSettingsMapper;
 import io.github.jhipster.web.util.ResponseUtil;
+import org.joda.time.Days;
+import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -23,12 +25,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * REST controller for managing PrPayrollSettings.
@@ -51,6 +51,51 @@ public class PrPayrollSettingsResource {
     }
 
     /**
+     *
+     * @param month
+     * @param year
+     * @return number of working days in that month
+     */
+    private Integer generateNumOfWorkingDays(Integer month, Integer year){
+        LocalDate startDate = LocalDate.of(year, month, 1);
+
+        int workDays = 0;
+        int nextMonth = startDate.getMonthValue() + 1;
+        while(startDate.getMonthValue() != nextMonth){
+            if(!startDate.getDayOfWeek().equals(DayOfWeek.SATURDAY) &&
+                !startDate.getDayOfWeek().equals(DayOfWeek.SUNDAY)){
+                workDays++;
+            }
+            startDate = startDate.plusDays(1);
+        }
+
+        return workDays;
+    }
+
+    /**
+     * automatically generates number of working days, hours, and calculation number, if needed
+     */
+    private void generatePayrollSetings(PrPayrollSettingsDTO prPayrollSettingsDTO){
+        final Integer payrollYear = prPayrollSettingsDTO.getYear();
+        final Integer payrollMonth = prPayrollSettingsDTO.getMonth();
+        final Long payrollSalaryTypeId = prPayrollSettingsDTO.getSalaryTypeId();
+        final Integer randomInt = new Random().nextInt(1000000);
+
+        final String calculationNumber = String.format("%d.%d.%d.%d", payrollYear,
+            payrollMonth,
+            payrollSalaryTypeId,
+            randomInt);
+        prPayrollSettingsDTO.setCalculationNumber(calculationNumber);
+
+
+        final Integer numOfWorkingDays = generateNumOfWorkingDays(payrollMonth, payrollYear);
+        prPayrollSettingsDTO.setNumberOfWorkingDays(numOfWorkingDays);
+
+        // num of working hours = numOfWorkingDays * 8
+        prPayrollSettingsDTO.setNumberOfWorkingHours(numOfWorkingDays * 8);
+    }
+
+    /**
      * POST  /pr-payroll-settings : Create a new prPayrollSettings.
      *
      * @param prPayrollSettingsDTO the prPayrollSettingsDTO to create
@@ -64,6 +109,9 @@ public class PrPayrollSettingsResource {
         if (prPayrollSettingsDTO.getId() != null) {
             throw new BadRequestAlertException("A new prPayrollSettings cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        // automatically generates number of working days, hours and calculation number if needed
+        generatePayrollSetings(prPayrollSettingsDTO);
+
         PrPayrollSettings prPayrollSettings = prPayrollSettingsMapper.toEntity(prPayrollSettingsDTO);
         prPayrollSettings = prPayrollSettingsRepository.save(prPayrollSettings);
         PrPayrollSettingsDTO result = prPayrollSettingsMapper.toDto(prPayrollSettings);
@@ -88,6 +136,10 @@ public class PrPayrollSettingsResource {
         if (prPayrollSettingsDTO.getId() == null) {
             return createPrPayrollSettings(prPayrollSettingsDTO);
         }
+
+        // automatically generates number of working days, hours and calculation number if needed
+        generatePayrollSetings(prPayrollSettingsDTO);
+
         PrPayrollSettings prPayrollSettings = prPayrollSettingsMapper.toEntity(prPayrollSettingsDTO);
         prPayrollSettings = prPayrollSettingsRepository.save(prPayrollSettings);
         PrPayrollSettingsDTO result = prPayrollSettingsMapper.toDto(prPayrollSettings);
