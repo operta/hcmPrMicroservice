@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -139,6 +139,26 @@ public class PrEmpSalariesResource {
         PrEmpSalaries prEmpSalaries = prEmpSalariesRepository.findByEmployeeIdAndPayrollSettingsId(employeeId, payrollId.longValue());
         PrEmpSalariesDTO prEmpSalariesDTO = prEmpSalariesMapper.toDto(prEmpSalaries);
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(prEmpSalariesDTO));
+    }
+
+        /**
+     * GET  /pr-emp-salaries/employee/:employeeId : get emp salary by emp
+     *
+     * @param employeeId the id of employee
+     * @return the ResponseEntity with status 200 (OK) and with body the prEmpSalariesDTO, or with status 404 (Not Found)
+     */
+    @GetMapping("/pr-emp-salaries/employee/{employeeId}")
+    @Timed
+    public ResponseEntity<List<PrEmpSalariesDTO>> getEmpSalariesByEmployee(
+        @PathVariable Integer employeeId
+    ) {
+        log.debug("REST request to get PrEmpSalaries by empId : {}", employeeId);
+        List<PrEmpSalaries> prEmpSalaries = prEmpSalariesRepository.findByEmployeeId(employeeId);
+        List<PrEmpSalariesDTO> dtoitems = new ArrayList<PrEmpSalariesDTO>();
+        for (PrEmpSalaries item : prEmpSalaries) {
+            dtoitems.add(prEmpSalariesMapper.toDto(item));
+        }
+        return new ResponseEntity<>(dtoitems, null, HttpStatus.OK);
     }
 
         /**

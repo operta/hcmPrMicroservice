@@ -15,4 +15,5 @@ import org.springframework.data.jpa.repository.*;
 @Repository
 public interface PrEmpSalarySuspItemsRepository extends JpaRepository<PrEmpSalarySuspItems, Long> {
     List<PrEmpSalarySuspItems> findByEmployeeSalaryId(Long id);
+    List<PrEmpSalarySuspItems> findByEmpSuspensionId(Long id);
 }

@@ -124,6 +124,25 @@ public class PrEmpSalarySuspItemsResource {
         return new ResponseEntity<>(dtoitems, null, HttpStatus.OK);
     }
 
+       /**
+     * GET  /pr-emp-salary-susp-items : get all the prEmpSalaryItems. by emp supsension
+     *
+     * @param id the id of emp suspension
+     * @return the ResponseEntity with status 200 (OK) and the list of prEmpSalaryItems in body
+     */
+    @GetMapping("/pr-emp-salary-susp-items/suspension/{id}")
+    @Timed
+    public ResponseEntity<List<PrEmpSalarySuspItemsDTO>> getSalaryItemsBySuspensionId(@PathVariable Integer id) {
+        log.debug("REST request to get a page of PrEmpSalarySuspItems");
+        List<PrEmpSalarySuspItems> items = prEmpSalarySuspItemsRepository.findByEmpSuspensionId(id.longValue());
+        List<PrEmpSalarySuspItemsDTO> dtoitems = new ArrayList<PrEmpSalarySuspItemsDTO>();
+        for (PrEmpSalarySuspItems item : items) {
+            dtoitems.add(prEmpSalarySuspItemsMapper.toDto(item));
+        }
+        return new ResponseEntity<>(dtoitems, null, HttpStatus.OK);
+    }
+
+
     /**
      * GET  /pr-emp-salary-susp-items/:id : get the "id" prEmpSalarySuspItems.
      *
