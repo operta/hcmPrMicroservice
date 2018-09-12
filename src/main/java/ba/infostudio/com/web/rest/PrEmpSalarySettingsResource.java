@@ -32,6 +32,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -179,27 +180,7 @@ public class PrEmpSalarySettingsResource {
         return new ResponseEntity<>(prEmpSalarySettingsMapper.toDto(page.getContent()), headers, HttpStatus.OK);
     }
 
-
-        /**
-     * GET  /pr-emp-salaries/check/employee/:employeeId/payroll/:payrollId : get emp salary by emp and payroll
-     *
-     * @param employeeId the id of employee
-     * @param payrollId the id of payroll
-     * @return the ResponseEntity with status 200 (OK) and with body the prEmpSalariesDTO, or with status 404 (Not Found)
-     */
-    @GetMapping("/pr-emp-salary-settings/check/employee/{employeeId}/payroll/{payrollId}")
-    @Timed
-    public ResponseEntity<PrEmpSalarySettingsDTO> checkEmpSalariesByEmployeeAndPayroll(
-        @PathVariable Integer employeeId,
-        @PathVariable Integer payrollId
-    ) {
-        log.debug("REST request to get PrEmpSalaries by empId and payrollId : {}", employeeId);
-        PrEmpSalarySettings prEmpSalaries = prEmpSalarySettingsRepository.findByEmployeeIdAndPayrollSettingsId(employeeId, payrollId.longValue());
-        PrEmpSalarySettingsDTO prEmpSalariesDTO = prEmpSalarySettingsMapper.toDto(prEmpSalaries);
-        return new ResponseEntity<PrEmpSalarySettingsDTO>(prEmpSalariesDTO, null, HttpStatus.OK);
-    }
-
-        /**
+    /**
      * GET  /pr-emp-salary-settings/employee/:employeeId/payroll/:payrollId : get emp salary settings by emp and payroll
      *
      * @param employeeId the id of employee
@@ -208,14 +189,37 @@ public class PrEmpSalarySettingsResource {
      */
     @GetMapping("/pr-emp-salary-settings/employee/{employeeId}/payroll/{payrollId}")
     @Timed
-    public ResponseEntity<PrEmpSalarySettingsDTO> getEmpSalariesByEmployeeAndPayroll(
+    public ResponseEntity<List<PrEmpSalarySettingsDTO>> getEmpSalariesByEmployeeAndPayroll(
         @PathVariable Integer employeeId,
         @PathVariable Integer payrollId
     ) {
         log.debug("REST request to get PrEmpSalarySettings by empId and payrollId : {}", employeeId);
-        PrEmpSalarySettings prEmpSalaries = prEmpSalarySettingsRepository.findByEmployeeIdAndPayrollSettingsId(employeeId, payrollId.longValue());
-        PrEmpSalarySettingsDTO prEmpSalariesDTO = prEmpSalarySettingsMapper.toDto(prEmpSalaries);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(prEmpSalariesDTO));
+        List<PrEmpSalarySettings> prEmpSalarySettings = prEmpSalarySettingsRepository.findByEmployeeIdAndPayrollSettingsId(employeeId, payrollId.longValue());
+        List<PrEmpSalarySettingsDTO> prEmpSalarySettingsDTO = new ArrayList<PrEmpSalarySettingsDTO>();
+        for(PrEmpSalarySettings settings : prEmpSalarySettings){
+            prEmpSalarySettingsDTO.add(prEmpSalarySettingsMapper.toDto(settings));
+        }
+       return new ResponseEntity<List<PrEmpSalarySettingsDTO>>(prEmpSalarySettingsDTO, HttpStatus.OK);
+    }
+
+     /**
+     * GET  /pr-emp-salary-settings/payroll/:payrollId : get emp salary settings by payroll
+     *
+     * @param payrollId the id of payroll
+     * @return the ResponseEntity with status 200 (OK) and with body the prEmpSalarySettingsDTO, or with status 404 (Not Found)
+     */
+    @GetMapping("/pr-emp-salary-settings/payroll/{payrollId}")
+    @Timed
+    public ResponseEntity<List<PrEmpSalarySettingsDTO>> getEmpSalariesByPayroll(
+        @PathVariable Integer payrollId
+    ) {
+        log.debug("REST request to get PrEmpSalarySettings by payrollId : {}", payrollId);
+        List<PrEmpSalarySettings> prEmpSalarySettings = prEmpSalarySettingsRepository.findByPayrollSettingsId(payrollId.longValue());
+        List<PrEmpSalarySettingsDTO> prEmpSalarySettingsDTO = new ArrayList<PrEmpSalarySettingsDTO>();
+        for(PrEmpSalarySettings settings : prEmpSalarySettings){
+            prEmpSalarySettingsDTO.add(prEmpSalarySettingsMapper.toDto(settings));
+        }
+       return new ResponseEntity<List<PrEmpSalarySettingsDTO>>(prEmpSalarySettingsDTO, HttpStatus.OK);
     }
 
     /**
