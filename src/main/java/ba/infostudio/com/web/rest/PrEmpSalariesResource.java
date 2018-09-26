@@ -22,9 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.Year;
+import java.util.*;
 
 /**
  * REST controller for managing PrEmpSalaries.
@@ -105,6 +104,56 @@ public class PrEmpSalariesResource {
         Page<PrEmpSalaries> page = prEmpSalariesRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/pr-emp-salaries");
         return new ResponseEntity<>(prEmpSalariesMapper.toDto(page.getContent()), headers, HttpStatus.OK);
+    }
+
+    static class YearlyCost{
+        private Integer year;
+        private Double totalAmount;
+
+        public YearlyCost(Integer year, Double totalAmount) {
+            this.year = year;
+            this.totalAmount = totalAmount;
+        }
+
+        public Integer getYear() {
+            return year;
+        }
+
+        public void setYear(Integer year) {
+            this.year = year;
+        }
+
+        public Double getTotalAmount() {
+            return totalAmount;
+        }
+
+        public void setTotalAmount(Double totalAmount) {
+            this.totalAmount = totalAmount;
+        }
+    }
+
+    @GetMapping("/pr-emp-salaries/total-per-year")
+    @Timed
+    public ResponseEntity<List<YearlyCost>> getPrEmpSalariesTotalPerYear() {
+        log.debug("REST request to get the total payment amount for every year");
+
+        List<PrEmpSalaries> prEmpSalaries = this.prEmpSalariesRepository.findAll();
+
+        Map<Integer, Double> totalCost = new TreeMap<>();
+
+        for (PrEmpSalaries salary : prEmpSalaries) {
+            if(totalCost.containsKey(salary.getYear())){
+                double previousCost = totalCost.get(salary.getYear());
+                totalCost.put(salary.getYear(), previousCost + salary.getPaymentAmount());
+            }else{
+                totalCost.put(salary.getYear(), salary.getPaymentAmount());
+            }
+        }
+        List<YearlyCost> totalCostPerYear = new ArrayList<>();
+        for (Map.Entry<Integer, Double> yearlyCost : totalCost.entrySet()){
+            totalCostPerYear.add(new YearlyCost(yearlyCost.getKey(), yearlyCost.getValue()));
+        }
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(totalCostPerYear));
     }
 
     /**
