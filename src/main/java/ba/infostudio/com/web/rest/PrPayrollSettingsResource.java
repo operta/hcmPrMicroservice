@@ -1,5 +1,8 @@
 package ba.infostudio.com.web.rest;
 
+import ba.infostudio.com.domain.PrEmpSalarySettings;
+import ba.infostudio.com.repository.PrEmpSalariesRepository;
+import ba.infostudio.com.repository.PrEmpSalarySettingsRepository;
 import com.codahale.metrics.annotation.Timed;
 import ba.infostudio.com.domain.PrPayrollSettings;
 
@@ -43,11 +46,20 @@ public class PrPayrollSettingsResource {
 
     private final PrPayrollSettingsRepository prPayrollSettingsRepository;
 
+    private final PrEmpSalariesRepository prEmpSalariesRepository;
+
+    private final PrEmpSalarySettingsRepository prEmpSalarySettingsRepository;
+
     private final PrPayrollSettingsMapper prPayrollSettingsMapper;
 
-    public PrPayrollSettingsResource(PrPayrollSettingsRepository prPayrollSettingsRepository, PrPayrollSettingsMapper prPayrollSettingsMapper) {
+    public PrPayrollSettingsResource(PrPayrollSettingsRepository prPayrollSettingsRepository,
+                                     PrEmpSalarySettingsRepository prEmpSalarySettingsRepository,
+                                     PrEmpSalariesRepository prEmpSalariesRepository,
+                                     PrPayrollSettingsMapper prPayrollSettingsMapper) {
         this.prPayrollSettingsRepository = prPayrollSettingsRepository;
         this.prPayrollSettingsMapper = prPayrollSettingsMapper;
+        this.prEmpSalariesRepository = prEmpSalariesRepository;
+        this.prEmpSalarySettingsRepository = prEmpSalarySettingsRepository;
     }
 
     /**
@@ -229,6 +241,8 @@ public class PrPayrollSettingsResource {
     @Timed
     public ResponseEntity<Void> deletePrPayrollSettings(@PathVariable Long id) {
         log.debug("REST request to delete PrPayrollSettings : {}", id);
+        prEmpSalariesRepository.deleteAllByPayrollSettingsId(id);
+        prEmpSalarySettingsRepository.deleteAllByPayrollSettingsId(id);
         prPayrollSettingsRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }

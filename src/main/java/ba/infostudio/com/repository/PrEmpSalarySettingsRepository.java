@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import org.springframework.data.jpa.repository.*;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -21,4 +22,7 @@ public interface PrEmpSalarySettingsRepository extends JpaRepository<PrEmpSalary
 
     @Query("SELECT COUNT(id) FROM EmEmpSalaries WHERE idEmployee.id=:empId AND (dateTo > :dateTo OR dateTo IS NULL)")
     Integer findNumOfEmpsWithDateToNotExpired(@Param("empId") Long empId, @Param("dateTo") LocalDate dateTo);
+
+    @Transactional
+    void deleteAllByPayrollSettingsId(Long id);
 }

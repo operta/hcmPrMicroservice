@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.*;
 
+import javax.transaction.Transactional;
+
 
 /**
  * Spring Data JPA repository for the PrEmpSalaries entity.
@@ -16,4 +18,7 @@ import org.springframework.data.jpa.repository.*;
 public interface PrEmpSalariesRepository extends JpaRepository<PrEmpSalaries, Long> {
     PrEmpSalaries findByEmployeeIdAndPayrollSettingsId(Integer id1, Long id2);
     List<PrEmpSalaries> findByEmployeeId(Integer id1);
+
+    @Transactional
+    void deleteAllByPayrollSettingsId(long id);
 }
