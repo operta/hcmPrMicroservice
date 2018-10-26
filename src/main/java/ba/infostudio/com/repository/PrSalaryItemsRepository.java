@@ -12,5 +12,6 @@ import org.springframework.data.jpa.repository.*;
 @SuppressWarnings("unused")
 @Repository
 public interface PrSalaryItemsRepository extends JpaRepository<PrSalaryItems, Long> {
+    PrSalaryItems findByCode(String code);
 
 }

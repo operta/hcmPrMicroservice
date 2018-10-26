@@ -12,5 +12,6 @@ import org.springframework.data.jpa.repository.*;
 @SuppressWarnings("unused")
 @Repository
 public interface PrSuspensionsRepository extends JpaRepository<PrSuspensions, Long> {
+    PrSuspensions findByCode(String code);
 
 }

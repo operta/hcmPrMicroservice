@@ -1,6 +1,5 @@
 package ba.infostudio.com.service.dto;
 
-
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
@@ -15,7 +14,6 @@ public class PrTaxesDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
     private String code;
 
     @NotNull

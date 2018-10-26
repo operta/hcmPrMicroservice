@@ -1,5 +1,7 @@
 package ba.infostudio.com.web.rest;
 
+import org.apache.commons.lang.RandomStringUtils;
+
 import com.codahale.metrics.annotation.Timed;
 import ba.infostudio.com.domain.PrTaxLevelPayments;
 
@@ -60,6 +62,11 @@ public class PrTaxLevelPaymentsResource {
         if (prTaxLevelPaymentsDTO.getId() != null) {
             throw new BadRequestAlertException("A new prTaxLevelPayments cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        String newCode = RandomStringUtils.randomAlphanumeric(7).toUpperCase();
+        while(prTaxLevelPaymentsRepository.findByCode(newCode) != null){
+            newCode = RandomStringUtils.randomAlphanumeric(7).toUpperCase();
+        }
+        prTaxLevelPaymentsDTO.setCode(newCode);
         PrTaxLevelPayments prTaxLevelPayments = prTaxLevelPaymentsMapper.toEntity(prTaxLevelPaymentsDTO);
         prTaxLevelPayments = prTaxLevelPaymentsRepository.save(prTaxLevelPayments);
         PrTaxLevelPaymentsDTO result = prTaxLevelPaymentsMapper.toDto(prTaxLevelPayments);

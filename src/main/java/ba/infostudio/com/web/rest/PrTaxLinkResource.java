@@ -1,5 +1,7 @@
 package ba.infostudio.com.web.rest;
 
+import org.apache.commons.lang.RandomStringUtils;
+
 import com.codahale.metrics.annotation.Timed;
 import ba.infostudio.com.domain.PrTaxLink;
 
@@ -60,6 +62,11 @@ public class PrTaxLinkResource {
         if (prTaxLinkDTO.getId() != null) {
             throw new BadRequestAlertException("A new prTaxLink cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        String newCode = RandomStringUtils.randomAlphanumeric(7).toUpperCase();
+        while(prTaxLinkRepository.findByCode(newCode) != null){
+            newCode = RandomStringUtils.randomAlphanumeric(7).toUpperCase();
+        }
+        prTaxLinkDTO.setCode(newCode);
         PrTaxLink prTaxLink = prTaxLinkMapper.toEntity(prTaxLinkDTO);
         prTaxLink = prTaxLinkRepository.save(prTaxLink);
         PrTaxLinkDTO result = prTaxLinkMapper.toDto(prTaxLink);

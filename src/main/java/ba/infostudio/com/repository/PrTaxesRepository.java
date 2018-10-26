@@ -12,5 +12,6 @@ import org.springframework.data.jpa.repository.*;
 @SuppressWarnings("unused")
 @Repository
 public interface PrTaxesRepository extends JpaRepository<PrTaxes, Long> {
+    PrTaxes findByCode(String code);
 
 }

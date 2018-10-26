@@ -1,5 +1,7 @@
 package ba.infostudio.com.web.rest;
 
+import org.apache.commons.lang.RandomStringUtils;
+
 import com.codahale.metrics.annotation.Timed;
 import ba.infostudio.com.domain.PrSalaryItems;
 
@@ -60,6 +62,11 @@ public class PrSalaryItemsResource {
         if (prSalaryItemsDTO.getId() != null) {
             throw new BadRequestAlertException("A new prSalaryItems cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        String newCode = RandomStringUtils.randomAlphanumeric(7).toUpperCase();
+        while(prSalaryItemsRepository.findByCode(newCode) != null){
+            newCode = RandomStringUtils.randomAlphanumeric(7).toUpperCase();
+        }
+        prSalaryItemsDTO.setCode(newCode);
         PrSalaryItems prSalaryItems = prSalaryItemsMapper.toEntity(prSalaryItemsDTO);
         prSalaryItems = prSalaryItemsRepository.save(prSalaryItems);
         PrSalaryItemsDTO result = prSalaryItemsMapper.toDto(prSalaryItems);

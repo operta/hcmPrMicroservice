@@ -1,5 +1,7 @@
 package ba.infostudio.com.web.rest;
 
+import org.apache.commons.lang.RandomStringUtils;
+
 import com.codahale.metrics.annotation.Timed;
 import ba.infostudio.com.domain.PrSuspensionTypes;
 
@@ -60,6 +62,11 @@ public class PrSuspensionTypesResource {
         if (prSuspensionTypesDTO.getId() != null) {
             throw new BadRequestAlertException("A new prSuspensionTypes cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        String newCode = RandomStringUtils.randomAlphanumeric(7).toUpperCase();
+        while(prSuspensionTypesRepository.findByCode(newCode) != null){
+            newCode = RandomStringUtils.randomAlphanumeric(7).toUpperCase();
+        }
+        prSuspensionTypesDTO.setCode(newCode);
         PrSuspensionTypes prSuspensionTypes = prSuspensionTypesMapper.toEntity(prSuspensionTypesDTO);
         prSuspensionTypes = prSuspensionTypesRepository.save(prSuspensionTypes);
         PrSuspensionTypesDTO result = prSuspensionTypesMapper.toDto(prSuspensionTypes);

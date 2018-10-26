@@ -1,5 +1,7 @@
 package ba.infostudio.com.web.rest;
 
+import org.apache.commons.lang.RandomStringUtils;
+
 import com.codahale.metrics.annotation.Timed;
 import ba.infostudio.com.domain.PrTypeOfTaxes;
 
@@ -60,6 +62,11 @@ public class PrTypeOfTaxesResource {
         if (prTypeOfTaxesDTO.getId() != null) {
             throw new BadRequestAlertException("A new prTypeOfTaxes cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        String newCode = RandomStringUtils.randomAlphanumeric(7).toUpperCase();
+        while(prTypeOfTaxesRepository.findByCode(newCode) != null){
+            newCode = RandomStringUtils.randomAlphanumeric(7).toUpperCase();
+        }
+        prTypeOfTaxesDTO.setCode(newCode);
         PrTypeOfTaxes prTypeOfTaxes = prTypeOfTaxesMapper.toEntity(prTypeOfTaxesDTO);
         prTypeOfTaxes = prTypeOfTaxesRepository.save(prTypeOfTaxes);
         PrTypeOfTaxesDTO result = prTypeOfTaxesMapper.toDto(prTypeOfTaxes);
