@@ -130,7 +130,9 @@ public class PrEmpSalarySettingsResource {
             log.debug("RESULT {}", result);
             return result;
         } else {
-            return 0.0;
+            Double result = 100 * (salarySettings.getNumberOfHours().doubleValue() / payrollSettings.getNumberOfWorkingHours().doubleValue()) * (salaryItem.getBase().doubleValue() / 100);
+            log.debug("RESULT {}", result);
+            return result;
         }
     }
 
