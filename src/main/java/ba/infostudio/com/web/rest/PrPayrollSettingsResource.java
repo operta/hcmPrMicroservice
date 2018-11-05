@@ -73,6 +73,9 @@ public class PrPayrollSettingsResource {
 
         int workDays = 0;
         int nextMonth = startDate.getMonthValue() + 1;
+        if(startDate.getMonthValue() == 12) {
+            nextMonth = 1;
+        }
         while(startDate.getMonthValue() != nextMonth){
             if(!startDate.getDayOfWeek().equals(DayOfWeek.SATURDAY) &&
                 !startDate.getDayOfWeek().equals(DayOfWeek.SUNDAY)){
