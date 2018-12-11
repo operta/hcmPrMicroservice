@@ -107,8 +107,7 @@ public class PrEmpSalarySettingsResource {
     private Double generateSalary(PrEmpSalarySettings salarySettings, PrSalaryItems salaryItem, PrPayrollSettings payrollSettings) {
 
         List<EmEmpSalaries> employeeSalaries = salariesRepository.findByIdEmployeeId(salarySettings.getEmployeeId().longValue());
-        log.debug("EMPLOYEE SALARIES {}", employeeSalaries);
-        if(!employeeSalaries.isEmpty() && employeeSalaries.size() > 0){
+        if(!employeeSalaries.isEmpty()){
             LocalDate lastMonth = employeeSalaries.get(0).getDateFrom();
 
             EmEmpSalaries lastSalary = employeeSalaries.get(0);
@@ -118,20 +117,17 @@ public class PrEmpSalarySettingsResource {
                     lastSalary = employeeSalaries.get(i);
                 }
             }
+            Double x = 100.0;
 
-            log.debug("LAST MONTH {}", lastMonth);
-            log.debug("LAST SALARY AMOUNT{}", lastSalary.getSalaryAmount());
-            log.debug("NUMBER OF HOURS {}",    salarySettings.getNumberOfHours() );
-            log.debug("NUMBER OF WORKING HOURS IN MONTH {}", payrollSettings.getNumberOfWorkingHours());
+            if(lastSalary != null || lastSalary.getSalaryAmount() != null) {
+                x = lastSalary.getSalaryAmount().doubleValue();
+            }
+            //TODO izbacit error da nema salarija?
 
-            log.debug("PAYROLL SETTING {}", payrollSettings);
-            log.debug("SALARY ITEM BASE {}",  salaryItem.getBase());
-            Double result = lastSalary.getSalaryAmount().doubleValue() * (salarySettings.getNumberOfHours().doubleValue() / payrollSettings.getNumberOfWorkingHours().doubleValue()) * (salaryItem.getBase().doubleValue() / 100);
-            log.debug("RESULT {}", result);
+            Double result = x * (salarySettings.getNumberOfHours().doubleValue() / payrollSettings.getNumberOfWorkingHours().doubleValue()) * (salaryItem.getBase().doubleValue() / 100);
             return result;
         } else {
             Double result = 100 * (salarySettings.getNumberOfHours().doubleValue() / payrollSettings.getNumberOfWorkingHours().doubleValue()) * (salaryItem.getBase().doubleValue() / 100);
-            log.debug("RESULT {}", result);
             return result;
         }
     }
