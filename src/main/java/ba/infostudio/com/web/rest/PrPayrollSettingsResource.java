@@ -2,6 +2,9 @@ package ba.infostudio.com.web.rest;
 
 import ba.infostudio.com.repository.PrEmpSalariesRepository;
 import ba.infostudio.com.repository.PrEmpSalarySettingsRepository;
+import ba.infostudio.com.service.PrPayrollSettingsService;
+import ba.infostudio.com.service.RestResponse;
+import ba.infostudio.com.service.UserPayrollComposition;
 import com.codahale.metrics.annotation.Timed;
 import ba.infostudio.com.domain.PrPayrollSettings;
 
@@ -28,6 +31,7 @@ import java.net.URISyntaxException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * REST controller for managing PrPayrollSettings.
@@ -48,14 +52,24 @@ public class PrPayrollSettingsResource {
 
     private final PrPayrollSettingsMapper prPayrollSettingsMapper;
 
+    private final PrPayrollSettingsService prPayrollSettingsService;
+
     public PrPayrollSettingsResource(PrPayrollSettingsRepository prPayrollSettingsRepository,
                                      PrEmpSalarySettingsRepository prEmpSalarySettingsRepository,
                                      PrEmpSalariesRepository prEmpSalariesRepository,
-                                     PrPayrollSettingsMapper prPayrollSettingsMapper) {
+                                     PrPayrollSettingsMapper prPayrollSettingsMapper,
+                                     PrPayrollSettingsService prPayrollSettingsService) {
         this.prPayrollSettingsRepository = prPayrollSettingsRepository;
         this.prPayrollSettingsMapper = prPayrollSettingsMapper;
         this.prEmpSalariesRepository = prEmpSalariesRepository;
         this.prEmpSalarySettingsRepository = prEmpSalarySettingsRepository;
+        this.prPayrollSettingsService = prPayrollSettingsService;
+    }
+
+
+    public enum GenerationType{
+        OBRACUN_PLATA,
+        PRIJEDLOG_PLATA
     }
 
     /**
@@ -235,6 +249,61 @@ public class PrPayrollSettingsResource {
         PrPayrollSettings prPayrollSettings = prPayrollSettingsRepository.findOne(id);
         PrPayrollSettingsDTO prPayrollSettingsDTO = prPayrollSettingsMapper.toDto(prPayrollSettings);
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(prPayrollSettingsDTO));
+    }
+
+
+    @PostMapping("/pr-payroll-settings/generate-payrolls")
+    @Timed
+    public ResponseEntity<RestResponse> generatePayrolls(@RequestBody UserPayrollComposition userPayrollComposition){
+        return generatePayrollUtil(userPayrollComposition, GenerationType.OBRACUN_PLATA,
+            "generate-payrolls", "payrollsNotGenerated");
+    }
+
+
+    @PostMapping("/pr-payroll-settings/generate-payroll-suggestion")
+    @Timed
+    public ResponseEntity<RestResponse> generatePayrollSuggestion(@RequestBody UserPayrollComposition userPayrollComposition){
+        return generatePayrollUtil(userPayrollComposition, GenerationType.PRIJEDLOG_PLATA,
+            "generate-payroll-suggestion", "payrollSuggestionNotGenerated");
+    }
+
+    private ResponseEntity<RestResponse> generatePayrollUtil(UserPayrollComposition userPayrollComposition,
+                                                             GenerationType generationType,
+                                                             String generationTypeName,
+                                                             String error){
+        if(userPayrollComposition.getUserId() == null){
+            throw new BadRequestAlertException("You must provide a user id", ENTITY_NAME, error);
+        }
+        if(userPayrollComposition.getPayrollSettings() == null){
+            throw new BadRequestAlertException("You must provide the payroll settings", ENTITY_NAME,
+                error);
+        }
+        log.debug("Request for " + generationType.name());
+
+        Integer year = userPayrollComposition.getPayrollSettings().getYear();
+        Integer month = userPayrollComposition.getPayrollSettings().getMonth();
+        String calculationNumber = userPayrollComposition.getPayrollSettings().getCalculationNumber();
+        Long userId = userPayrollComposition.getUserId();
+        Long salaryTypeId = userPayrollComposition.getPayrollSettings().getSalaryTypeId();
+
+        String output = "";
+
+        if(generationType.equals(GenerationType.OBRACUN_PLATA)) {
+            output = prPayrollSettingsService.obracunPlata(year, month, salaryTypeId, calculationNumber, userId);
+        }else{
+            output = prPayrollSettingsService.prijedlogPlata(year, month, salaryTypeId, calculationNumber, userId);
+        }
+        if(!output.equals("D")){
+            throw new BadRequestAlertException("There was an error while generating payrolls", ENTITY_NAME,
+                error);
+        }
+
+        log.debug("OUTPUT FROM PROCEDURE {}", output);
+
+        return ResponseEntity.created(URI.create("/api/" + generationTypeName + "/"))
+            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, output))
+            .body(new RestResponse("You've successfully generated " + generationType.name(),"success"));
+
     }
 
     /**

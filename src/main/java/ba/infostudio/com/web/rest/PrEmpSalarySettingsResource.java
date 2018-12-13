@@ -33,6 +33,7 @@ import java.net.URISyntaxException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,18 +86,25 @@ public class PrEmpSalarySettingsResource {
         if (prEmpSalarySettingsDTO.getId() != null) {
             throw new BadRequestAlertException("A new prEmpSalarySettings cannot already have an ID", ENTITY_NAME, "idexists");
         }
-
+        if (prEmpSalarySettingsDTO.getSalaryItemId() == null){
+            throw new BadRequestAlertException("No Salary item for prEmpSalarySettings", ENTITY_NAME,
+                "nosalaryitem");
+        }
+        if (prEmpSalarySettingsDTO.getPayrollSettingsId() == null){
+            throw new BadRequestAlertException("No Payroll settings for PrEmpSalarySettings", ENTITY_NAME,
+                "nopayrollsettings");
+        }
         PrEmpSalarySettings prEmpSalarySettings = prEmpSalarySettingsMapper.toEntity(prEmpSalarySettingsDTO);
-        log.debug("SETTINGS {}", prEmpSalarySettings);
 
         PrSalaryItems salaryItem = salaryItemsRepository.findOne(prEmpSalarySettings.getSalaryItem().getId());
         PrPayrollSettings payrollSettings = payrollSettingsRepository.findOne(prEmpSalarySettings.getPayrollSettings().getId());
-        log.debug("SALARY ITEM {}", salaryItem);
-        log.debug("IS PERCENTAGE PAYMENT {}", salaryItem.getPercentagePayment());
+
+        checkIfExistsSalaryItemAndPayrollSettings(salaryItem, payrollSettings);
+
         if(salaryItem.getPercentagePayment().equals("Y")){
-            log.debug("PERCENTAGE PAYMENT!");
             prEmpSalarySettings.setAmount(this.generateSalary(prEmpSalarySettings, salaryItem, payrollSettings));
         }
+
         prEmpSalarySettings = prEmpSalarySettingsRepository.save(prEmpSalarySettings);
         PrEmpSalarySettingsDTO result = prEmpSalarySettingsMapper.toDto(prEmpSalarySettings);
         return ResponseEntity.created(new URI("/api/pr-emp-salary-settings/" + result.getId()))
@@ -104,32 +112,29 @@ public class PrEmpSalarySettingsResource {
             .body(result);
     }
 
-    private Double generateSalary(PrEmpSalarySettings salarySettings, PrSalaryItems salaryItem, PrPayrollSettings payrollSettings) {
-
-        List<EmEmpSalaries> employeeSalaries = salariesRepository.findByIdEmployeeId(salarySettings.getEmployeeId().longValue());
-        if(!employeeSalaries.isEmpty()){
-            LocalDate lastMonth = employeeSalaries.get(0).getDateFrom();
-
-            EmEmpSalaries lastSalary = employeeSalaries.get(0);
-            for(int i = 0; i< employeeSalaries.size(); i++){
-                if(employeeSalaries.get(i).getDateFrom().isAfter(lastMonth)){
-                    lastMonth = employeeSalaries.get(i).getDateFrom();
-                    lastSalary = employeeSalaries.get(i);
-                }
-            }
-            Double x = 100.0;
-
-            if(lastSalary != null || lastSalary.getSalaryAmount() != null) {
-                x = lastSalary.getSalaryAmount().doubleValue();
-            }
-            //TODO izbacit error da nema salarija?
-
-            Double result = x * (salarySettings.getNumberOfHours().doubleValue() / payrollSettings.getNumberOfWorkingHours().doubleValue()) * (salaryItem.getBase().doubleValue() / 100);
-            return result;
-        } else {
-            Double result = 100 * (salarySettings.getNumberOfHours().doubleValue() / payrollSettings.getNumberOfWorkingHours().doubleValue()) * (salaryItem.getBase().doubleValue() / 100);
-            return result;
+    private void checkIfExistsSalaryItemAndPayrollSettings(PrSalaryItems salaryItem, PrPayrollSettings payrollSettings) {
+        if(salaryItem == null){
+            throw new BadRequestAlertException("Salary item does not exist", ENTITY_NAME, "nosalaryitem");
         }
+        if(payrollSettings == null){
+            throw new BadRequestAlertException("Payroll settings does not exist", ENTITY_NAME, "nopayrollsettings");
+        }
+    }
+
+    private Double generateSalary(PrEmpSalarySettings salarySettings, PrSalaryItems salaryItem, PrPayrollSettings payrollSettings) {
+        List<EmEmpSalaries> employeeSalaries = salariesRepository.findByIdEmployeeId(salarySettings.getEmployeeId().longValue());
+
+        EmEmpSalaries lastSalary = employeeSalaries.stream()
+            .max(Comparator.comparing(EmEmpSalaries::getDateFrom))
+            .orElse(null);
+
+        double result = 100 * (salarySettings.getNumberOfHours().doubleValue() / payrollSettings.getNumberOfWorkingHours().doubleValue()) * (salaryItem.getBase() / 100);
+
+        if(lastSalary != null && lastSalary.getSalaryAmount() != null){
+            result = lastSalary.getSalaryAmount() * (salarySettings.getNumberOfHours().doubleValue() / payrollSettings.getNumberOfWorkingHours().doubleValue()) * (salaryItem.getBase() / 100);
+        }
+
+        return result;
     }
 
 

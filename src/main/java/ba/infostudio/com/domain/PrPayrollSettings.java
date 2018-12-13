@@ -15,6 +15,21 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "pr_payroll_settings")
+/*
+@NamedStoredProcedureQueries({
+ @NamedStoredProcedureQuery(
+     name = "p_obracun_plata",
+     procedureName = "PKG_OBRACUN_PLATA_FBIH.p_obracun_plata",
+     parameters = {
+         @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_godina", type = Integer.class),
+         @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_mjesec", type = Integer.class),
+         @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_tip_isplate", type = String.class),
+         @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_broj_racuna", type = String.class),
+         @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_korisnik", type = String.class),
+         @StoredProcedureParameter(mode = ParameterMode.OUT, name = "p_out", type = String.class)
+     }
+ )
+})*/
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class PrPayrollSettings extends AbstractAuditingEntity implements Serializable {
 
