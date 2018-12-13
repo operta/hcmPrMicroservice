@@ -1,6 +1,5 @@
 package ba.infostudio.com.web.rest;
 
-import ba.infostudio.com.domain.PrEmpSalarySettings;
 import ba.infostudio.com.repository.PrEmpSalariesRepository;
 import ba.infostudio.com.repository.PrEmpSalarySettingsRepository;
 import com.codahale.metrics.annotation.Timed;
@@ -13,8 +12,6 @@ import ba.infostudio.com.web.rest.util.PaginationUtil;
 import ba.infostudio.com.service.dto.PrPayrollSettingsDTO;
 import ba.infostudio.com.service.mapper.PrPayrollSettingsMapper;
 import io.github.jhipster.web.util.ResponseUtil;
-import org.joda.time.Days;
-import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -30,7 +27,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -68,7 +64,7 @@ public class PrPayrollSettingsResource {
      * @param year
      * @return number of working days in that month
      */
-    private Integer generateNumOfWorkingDays(Integer month, Integer year){
+    private Integer getNumOfWorkingDays(Integer month, Integer year){
         LocalDate startDate = LocalDate.of(year, month, 1);
 
         int workDays = 0;
@@ -87,6 +83,13 @@ public class PrPayrollSettingsResource {
         return workDays;
     }
 
+    private Integer getPrSequence(Integer month, Integer year){
+        List<PrPayrollSettings> prSettingsInYearAndMonth = prPayrollSettingsRepository.findByMonthAndYear(month,
+            year);
+
+        return prSettingsInYearAndMonth.size() + 1;
+    }
+
     /**
      * automatically generates number of working days, hours, and calculation number, if needed
      */
@@ -94,19 +97,19 @@ public class PrPayrollSettingsResource {
         final Integer payrollYear = prPayrollSettingsDTO.getYear();
         final Integer payrollMonth = prPayrollSettingsDTO.getMonth();
         final Long payrollSalaryTypeId = prPayrollSettingsDTO.getSalaryTypeId();
-        final Integer randomInt = new Random().nextInt(1000000);
+        final Integer prSequence = getPrSequence(payrollMonth, payrollYear);
 
         final String calculationNumber = payrollYear.toString() + '.' +
             payrollMonth.toString() + '.' +
             payrollSalaryTypeId.toString() + '.' +
-            randomInt.toString();
+            prSequence.toString();
+
         prPayrollSettingsDTO.setCalculationNumber(calculationNumber);
 
 
-        final Integer numOfWorkingDays = generateNumOfWorkingDays(payrollMonth, payrollYear);
-        prPayrollSettingsDTO.setNumberOfWorkingDays(numOfWorkingDays);
+        final Integer numOfWorkingDays = getNumOfWorkingDays(payrollMonth, payrollYear);
 
-        // num of working hours = numOfWorkingDays * 8
+        prPayrollSettingsDTO.setNumberOfWorkingDays(numOfWorkingDays);
         prPayrollSettingsDTO.setNumberOfWorkingHours(numOfWorkingDays * 8);
     }
 
