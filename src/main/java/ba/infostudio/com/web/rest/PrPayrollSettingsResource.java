@@ -69,7 +69,8 @@ public class PrPayrollSettingsResource {
 
     public enum GenerationType{
         OBRACUN_PLATA,
-        PRIJEDLOG_PLATA
+        PRIJEDLOG_PLATA,
+        OBRISI_OBRACUN_PLATA
     }
 
     /**
@@ -252,6 +253,16 @@ public class PrPayrollSettingsResource {
     }
 
 
+    @PostMapping("/pr-payroll-settings/delete-payrolls")
+    @Timed
+    public ResponseEntity<RestResponse> deletePayrolls(@RequestBody UserPayrollComposition userPayrollComposition){
+        return generatePayrollUtil(userPayrollComposition, GenerationType.OBRACUN_PLATA,
+            "delete-payrolls", "payrollsDeleted");
+    }
+
+
+
+
     @PostMapping("/pr-payroll-settings/generate-payrolls")
     @Timed
     public ResponseEntity<RestResponse> generatePayrolls(@RequestBody UserPayrollComposition userPayrollComposition){
@@ -290,8 +301,10 @@ public class PrPayrollSettingsResource {
 
         if(generationType.equals(GenerationType.OBRACUN_PLATA)) {
             output = prPayrollSettingsService.obracunPlata(year, month, salaryTypeId, calculationNumber, userId);
-        }else{
+        }else if(generationType.equals(GenerationType.PRIJEDLOG_PLATA)){
             output = prPayrollSettingsService.prijedlogPlata(year, month, salaryTypeId, calculationNumber, userId);
+        } else {
+            output = prPayrollSettingsService.obrisiPlate(year, month, salaryTypeId, calculationNumber, userId);
         }
         if(!output.equals("D")){
             throw new BadRequestAlertException("There was an error while generating payrolls", ENTITY_NAME,

@@ -31,6 +31,15 @@ public class PrPayrollSettingsService {
             calculatioNumber, userId);
     }
 
+    public String obrisiPlate(Integer year, Integer month,
+                                 Long salaryTypeId, String calculatioNumber,
+                                 Long userId){
+        String procedureName = "PKG_PRIJEDLOG_PLATA.p_obrisi_obracun_plata";
+
+        return executeProcedure(procedureName, year, month, salaryTypeId,
+            calculatioNumber, userId);
+    }
+
     private String executeProcedure(String procedureName,
                                     Integer year,
                                     Integer month,
