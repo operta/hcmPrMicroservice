@@ -256,7 +256,7 @@ public class PrPayrollSettingsResource {
     @PostMapping("/pr-payroll-settings/delete-payrolls")
     @Timed
     public ResponseEntity<RestResponse> deletePayrolls(@RequestBody UserPayrollComposition userPayrollComposition){
-        return generatePayrollUtil(userPayrollComposition, GenerationType.OBRACUN_PLATA,
+        return generatePayrollUtil(userPayrollComposition, GenerationType.OBRISI_OBRACUN_PLATA,
             "delete-payrolls", "payrollsDeleted");
     }
 
@@ -266,6 +266,7 @@ public class PrPayrollSettingsResource {
     @PostMapping("/pr-payroll-settings/generate-payrolls")
     @Timed
     public ResponseEntity<RestResponse> generatePayrolls(@RequestBody UserPayrollComposition userPayrollComposition){
+        log.debug("PAYROLL {}", userPayrollComposition);
         return generatePayrollUtil(userPayrollComposition, GenerationType.OBRACUN_PLATA,
             "generate-payrolls", "payrollsNotGenerated");
     }
@@ -294,7 +295,7 @@ public class PrPayrollSettingsResource {
         Integer year = userPayrollComposition.getPayrollSettings().getYear();
         Integer month = userPayrollComposition.getPayrollSettings().getMonth();
         String calculationNumber = userPayrollComposition.getPayrollSettings().getCalculationNumber();
-        Long userId = userPayrollComposition.getUserId();
+        String userId = userPayrollComposition.getUserId();
         Long salaryTypeId = userPayrollComposition.getPayrollSettings().getSalaryTypeId();
 
         String output = "";
@@ -306,7 +307,7 @@ public class PrPayrollSettingsResource {
         } else {
             output = prPayrollSettingsService.obrisiPlate(year, month, salaryTypeId, calculationNumber, userId);
         }
-        if(!output.equals("D")){
+        if(!output.equals("D") && (generationType.equals(GenerationType.OBRACUN_PLATA) || generationType.equals(GenerationType.PRIJEDLOG_PLATA))){
             throw new BadRequestAlertException("There was an error while generating payrolls", ENTITY_NAME,
                 error);
         }

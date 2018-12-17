@@ -3,15 +3,15 @@ package ba.infostudio.com.service;
 import ba.infostudio.com.service.dto.PrPayrollSettingsDTO;
 
 public class UserPayrollComposition {
-    private Long userId;
+    private String userId;
 
     private PrPayrollSettingsDTO payrollSettings;
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
