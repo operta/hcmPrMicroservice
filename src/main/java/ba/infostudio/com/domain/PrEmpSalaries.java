@@ -46,7 +46,7 @@ public class PrEmpSalaries extends AbstractAuditingEntity implements Serializabl
     @Column(name = "net_amount")
     private Double netAmount;
 
-    @Column(name = "tax_relief")
+    @Column(name = "tax_reduction_amount")
     private Double taxRelief;
 
     @Column(name = "tax_base_amount")
@@ -64,7 +64,7 @@ public class PrEmpSalaries extends AbstractAuditingEntity implements Serializabl
     @Column(name = "number_of_working_days")
     private Integer numberOfWorkingDays;
 
-    @Column(name = "number_of_workig_hours")
+    @Column(name = "number_of_working_hours")
     private Integer numberOfWorkingHours;
 
     @Column(name = "organization_id")
