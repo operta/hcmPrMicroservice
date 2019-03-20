@@ -46,12 +46,25 @@ ribbon:
 #                    thread:
 #                        timeoutInMilliseconds: 10000
 # See https://github.com/spring-cloud/spring-cloud-netflix/issues/1330
-feign:
-    hystrix:
-        enabled: true
+zuul:
+    host:
+        connect-timeout-millis: 50000
+        socket-timeout-millis: 50000
 
 hystrix:
     share-security-context: true
+    command:
+        default:
+            execution:
+                timeout:
+                    enabled: false
+                isolation:
+                    thread:
+                        timeoutInMilliseconds: 50000
+
+feign:
+    hystrix:
+        enabled: true
 
 management:
     security:
