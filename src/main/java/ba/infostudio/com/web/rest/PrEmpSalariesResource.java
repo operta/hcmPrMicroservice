@@ -1,6 +1,7 @@
 package ba.infostudio.com.web.rest;
 
 import ba.infostudio.com.domain.Action;
+import ba.infostudio.com.security.SecurityUtils;
 import ba.infostudio.com.web.rest.util.AuditUtil;
 import com.codahale.metrics.annotation.Timed;
 import ba.infostudio.com.domain.PrEmpSalaries;
@@ -72,7 +73,6 @@ public class PrEmpSalariesResource {
         PrEmpSalariesDTO result = prEmpSalariesMapper.toDto(prEmpSalaries);
         applicationEventPublisher.publishEvent(
             AuditUtil.createAuditEvent(
-                result.getCreatedBy(),
                 "payroll",
                 ENTITY_NAME,
                 result.getId().toString(),
@@ -114,7 +114,6 @@ public class PrEmpSalariesResource {
         PrEmpSalariesDTO result = prEmpSalariesMapper.toDto(prEmpSalaries);
         applicationEventPublisher.publishEvent(
             AuditUtil.createAuditEvent(
-                result.getUpdatedBy(),
                 "payroll",
                 ENTITY_NAME,
                 result.getId().toString(),
@@ -285,11 +284,9 @@ public class PrEmpSalariesResource {
     public ResponseEntity<Void> deletePrEmpSalaries(@PathVariable Long id) {
         log.debug("REST request to delete PrEmpSalaries : {}", id);
         PrEmpSalaries prEmpSalaries = prEmpSalariesRepository.findOne(id);
-        PrEmpSalariesDTO prEmpSalariesDTO = prEmpSalariesMapper.toDto(prEmpSalaries);
         prEmpSalariesRepository.delete(id);
         applicationEventPublisher.publishEvent(
             AuditUtil.createAuditEvent(
-                prEmpSalariesDTO.getUpdatedBy(),
                 "payroll",
                 ENTITY_NAME,
                 id.toString(),

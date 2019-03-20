@@ -3,6 +3,7 @@ package ba.infostudio.com.web.rest;
 import ba.infostudio.com.domain.Action;
 import ba.infostudio.com.repository.PrEmpSalariesRepository;
 import ba.infostudio.com.repository.PrEmpSalarySettingsRepository;
+import ba.infostudio.com.security.SecurityUtils;
 import ba.infostudio.com.service.PrPayrollSettingsService;
 import ba.infostudio.com.service.RestResponse;
 import ba.infostudio.com.service.UserPayrollComposition;
@@ -157,7 +158,6 @@ public class PrPayrollSettingsResource {
         PrPayrollSettingsDTO result = prPayrollSettingsMapper.toDto(prPayrollSettings);
         applicationEventPublisher.publishEvent(
             AuditUtil.createAuditEvent(
-                result.getCreatedBy(),
                 "payroll",
                 ENTITY_NAME,
                 result.getId().toString(),
@@ -194,7 +194,6 @@ public class PrPayrollSettingsResource {
         PrPayrollSettingsDTO result = prPayrollSettingsMapper.toDto(prPayrollSettings);
         applicationEventPublisher.publishEvent(
             AuditUtil.createAuditEvent(
-                result.getUpdatedBy(),
                 "payroll",
                 ENTITY_NAME,
                 result.getId().toString(),
@@ -364,14 +363,11 @@ public class PrPayrollSettingsResource {
     @Timed
     public ResponseEntity<Void> deletePrPayrollSettings(@PathVariable Long id) {
         log.debug("REST request to delete PrPayrollSettings : {}", id);
-        PrPayrollSettings prPayrollSettings = prPayrollSettingsRepository.findOne(id);
-        PrPayrollSettingsDTO prPayrollSettingsDTO = prPayrollSettingsMapper.toDto(prPayrollSettings);
         prEmpSalariesRepository.deleteAllByPayrollSettingsId(id);
         prEmpSalarySettingsRepository.deleteAllByPayrollSettingsId(id);
         prPayrollSettingsRepository.delete(id);
         applicationEventPublisher.publishEvent(
             AuditUtil.createAuditEvent(
-                prPayrollSettingsDTO.getUpdatedBy(),
                 "payroll",
                 ENTITY_NAME,
                 id.toString(),

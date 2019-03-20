@@ -2,6 +2,7 @@ package ba.infostudio.com.web.rest.util;
 
 
 import ba.infostudio.com.domain.Action;
+import ba.infostudio.com.security.SecurityUtils;
 import org.springframework.boot.actuate.audit.listener.AuditApplicationEvent;
 
 public final class AuditUtil {
@@ -40,9 +41,40 @@ public final class AuditUtil {
         return null;
     }
 
+    public static AuditApplicationEvent createAuditEvent(String type, String entityName, String entityId, Action action) {
+        switch (action) {
+            case POST:
+                return new AuditApplicationEvent(
+                    SecurityUtils.getCurrentUserLogin().orElse("/"),
+                    type,
+                    "message=" + HeaderUtil.createEntityCreationAlert(entityName, entityId)
+                );
+            case PUT:
+                return new AuditApplicationEvent(
+                    SecurityUtils.getCurrentUserLogin().orElse("/"),
+                    type,
+                    "message=" + HeaderUtil.createEntityUpdateAlert(entityName, entityId)
+                );
+            case DELETE:
+                return new AuditApplicationEvent(
+                    SecurityUtils.getCurrentUserLogin().orElse("/"),
+                    type,
+                    "message=" + HeaderUtil.createEntityDeletionAlert(entityName, entityId)
+                );
+
+            case ARCHIVE:
+                return new AuditApplicationEvent(
+                    SecurityUtils.getCurrentUserLogin().orElse("/"),
+                    type,
+                    "message=" + HeaderUtil.createEntityDeletionAlert(entityName, entityId)
+                );
+        }
+        return null;
+    }
+
     public static AuditApplicationEvent createAuditEvent(String message) {
         return new AuditApplicationEvent(
-            null,
+            SecurityUtils.getCurrentUserLogin().orElse("/"),
             "payroll",
             "message=" + message
         );

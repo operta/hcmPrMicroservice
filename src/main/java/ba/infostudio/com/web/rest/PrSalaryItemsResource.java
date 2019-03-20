@@ -1,6 +1,7 @@
 package ba.infostudio.com.web.rest;
 
 import ba.infostudio.com.domain.Action;
+import ba.infostudio.com.security.SecurityUtils;
 import ba.infostudio.com.web.rest.util.AuditUtil;
 import org.apache.commons.lang.RandomStringUtils;
 
@@ -80,7 +81,6 @@ public class PrSalaryItemsResource {
         PrSalaryItemsDTO result = prSalaryItemsMapper.toDto(prSalaryItems);
         applicationEventPublisher.publishEvent(
             AuditUtil.createAuditEvent(
-                result.getCreatedBy(),
                 "payroll",
                 ENTITY_NAME,
                 result.getId().toString(),
@@ -114,7 +114,6 @@ public class PrSalaryItemsResource {
         PrSalaryItemsDTO result = prSalaryItemsMapper.toDto(prSalaryItems);
         applicationEventPublisher.publishEvent(
             AuditUtil.createAuditEvent(
-                result.getUpdatedBy(),
                 "payroll",
                 ENTITY_NAME,
                 result.getId().toString(),
@@ -166,12 +165,9 @@ public class PrSalaryItemsResource {
     @Timed
     public ResponseEntity<Void> deletePrSalaryItems(@PathVariable Long id) {
         log.debug("REST request to delete PrSalaryItems : {}", id);
-        PrSalaryItems salaryItems = prSalaryItemsRepository.findOne(id);
-        PrSalaryItemsDTO salaryItemsDTO = prSalaryItemsMapper.toDto(salaryItems);
         prSalaryItemsRepository.delete(id);
         applicationEventPublisher.publishEvent(
             AuditUtil.createAuditEvent(
-                salaryItemsDTO.getUpdatedBy(),
                 "payroll",
                 ENTITY_NAME,
                 id.toString(),

@@ -2,6 +2,7 @@ package ba.infostudio.com.web.rest;
 
 import ba.infostudio.com.domain.Action;
 import ba.infostudio.com.domain.EmEmployees;
+import ba.infostudio.com.security.SecurityUtils;
 import ba.infostudio.com.service.dto.EmEmployeesDTO;
 import ba.infostudio.com.service.mapper.EmEmployeesMapper;
 import ba.infostudio.com.web.rest.util.AuditUtil;
@@ -77,7 +78,6 @@ public class PrEmployeeSuspensionsResource {
 
         applicationEventPublisher.publishEvent(
             AuditUtil.createAuditEvent(
-                result.getCreatedBy(),
                 "payroll",
                 ENTITY_NAME,
                 result.getId().toString(),
@@ -119,7 +119,6 @@ public class PrEmployeeSuspensionsResource {
         PrEmployeeSuspensionsDTO result = prEmployeeSuspensionsMapper.toDto(prEmployeeSuspensions);
         applicationEventPublisher.publishEvent(
             AuditUtil.createAuditEvent(
-                result.getUpdatedBy(),
                 "payroll",
                 ENTITY_NAME,
                 result.getId().toString(),
@@ -197,11 +196,9 @@ public class PrEmployeeSuspensionsResource {
     public ResponseEntity<Void> deletePrEmployeeSuspensions(@PathVariable Long id) {
         log.debug("REST request to delete PrEmployeeSuspensions : {}", id);
         PrEmployeeSuspensions suspensions = prEmployeeSuspensionsRepository.findOne(id);
-        PrEmployeeSuspensionsDTO suspensionsDTO = prEmployeeSuspensionsMapper.toDto(suspensions);
         prEmployeeSuspensionsRepository.delete(id);
         applicationEventPublisher.publishEvent(
             AuditUtil.createAuditEvent(
-                suspensionsDTO.getUpdatedBy(),
                 "payroll",
                 ENTITY_NAME,
                 id.toString(),
