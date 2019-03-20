@@ -1,5 +1,7 @@
 package ba.infostudio.com.web.rest;
 
+import ba.infostudio.com.domain.Action;
+import ba.infostudio.com.web.rest.util.AuditUtil;
 import com.codahale.metrics.annotation.Timed;
 import ba.infostudio.com.domain.PrEmpSalaries;
 
@@ -12,6 +14,7 @@ import ba.infostudio.com.service.mapper.PrEmpSalariesMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -40,9 +43,14 @@ public class PrEmpSalariesResource {
 
     private final PrEmpSalariesMapper prEmpSalariesMapper;
 
-    public PrEmpSalariesResource(PrEmpSalariesRepository prEmpSalariesRepository, PrEmpSalariesMapper prEmpSalariesMapper) {
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    public PrEmpSalariesResource(PrEmpSalariesRepository prEmpSalariesRepository,
+                                 PrEmpSalariesMapper prEmpSalariesMapper,
+                                 ApplicationEventPublisher applicationEventPublisher) {
         this.prEmpSalariesRepository = prEmpSalariesRepository;
         this.prEmpSalariesMapper = prEmpSalariesMapper;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     /**
@@ -62,6 +70,24 @@ public class PrEmpSalariesResource {
         PrEmpSalaries prEmpSalaries = prEmpSalariesMapper.toEntity(prEmpSalariesDTO);
         prEmpSalaries = prEmpSalariesRepository.save(prEmpSalaries);
         PrEmpSalariesDTO result = prEmpSalariesMapper.toDto(prEmpSalaries);
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                result.getCreatedBy(),
+                "payroll",
+                ENTITY_NAME,
+                result.getId().toString(),
+                Action.POST
+            )
+        );
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                prEmpSalaries.getEmployeeId().toString(),
+                "employee",
+                ENTITY_NAME,
+                result.getId().toString(),
+                Action.POST
+            )
+        );
         return ResponseEntity.created(new URI("/api/pr-emp-salaries/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -86,6 +112,24 @@ public class PrEmpSalariesResource {
         PrEmpSalaries prEmpSalaries = prEmpSalariesMapper.toEntity(prEmpSalariesDTO);
         prEmpSalaries = prEmpSalariesRepository.save(prEmpSalaries);
         PrEmpSalariesDTO result = prEmpSalariesMapper.toDto(prEmpSalaries);
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                result.getUpdatedBy(),
+                "payroll",
+                ENTITY_NAME,
+                result.getId().toString(),
+                Action.PUT
+            )
+        );
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                prEmpSalaries.getEmployeeId().toString(),
+                "employee",
+                ENTITY_NAME,
+                result.getId().toString(),
+                Action.PUT
+            )
+        );
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, prEmpSalariesDTO.getId().toString()))
             .body(result);
@@ -240,7 +284,27 @@ public class PrEmpSalariesResource {
     @Timed
     public ResponseEntity<Void> deletePrEmpSalaries(@PathVariable Long id) {
         log.debug("REST request to delete PrEmpSalaries : {}", id);
+        PrEmpSalaries prEmpSalaries = prEmpSalariesRepository.findOne(id);
+        PrEmpSalariesDTO prEmpSalariesDTO = prEmpSalariesMapper.toDto(prEmpSalaries);
         prEmpSalariesRepository.delete(id);
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                prEmpSalariesDTO.getUpdatedBy(),
+                "payroll",
+                ENTITY_NAME,
+                id.toString(),
+                Action.DELETE
+            )
+        );
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                prEmpSalaries.getEmployeeId().toString(),
+                "employee",
+                ENTITY_NAME,
+                id.toString(),
+                Action.DELETE
+            )
+        );
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

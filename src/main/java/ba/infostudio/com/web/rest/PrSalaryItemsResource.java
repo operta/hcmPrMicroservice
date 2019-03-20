@@ -1,5 +1,7 @@
 package ba.infostudio.com.web.rest;
 
+import ba.infostudio.com.domain.Action;
+import ba.infostudio.com.web.rest.util.AuditUtil;
 import org.apache.commons.lang.RandomStringUtils;
 
 import com.codahale.metrics.annotation.Timed;
@@ -14,6 +16,7 @@ import ba.infostudio.com.service.mapper.PrSalaryItemsMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -43,9 +46,14 @@ public class PrSalaryItemsResource {
 
     private final PrSalaryItemsMapper prSalaryItemsMapper;
 
-    public PrSalaryItemsResource(PrSalaryItemsRepository prSalaryItemsRepository, PrSalaryItemsMapper prSalaryItemsMapper) {
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    public PrSalaryItemsResource(PrSalaryItemsRepository prSalaryItemsRepository,
+                                 PrSalaryItemsMapper prSalaryItemsMapper,
+                                 ApplicationEventPublisher applicationEventPublisher) {
         this.prSalaryItemsRepository = prSalaryItemsRepository;
         this.prSalaryItemsMapper = prSalaryItemsMapper;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     /**
@@ -70,6 +78,16 @@ public class PrSalaryItemsResource {
         PrSalaryItems prSalaryItems = prSalaryItemsMapper.toEntity(prSalaryItemsDTO);
         prSalaryItems = prSalaryItemsRepository.save(prSalaryItems);
         PrSalaryItemsDTO result = prSalaryItemsMapper.toDto(prSalaryItems);
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                result.getCreatedBy(),
+                "payroll",
+                ENTITY_NAME,
+                result.getId().toString(),
+                Action.POST
+            )
+        );
+
         return ResponseEntity.created(new URI("/api/pr-salary-items/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -94,6 +112,15 @@ public class PrSalaryItemsResource {
         PrSalaryItems prSalaryItems = prSalaryItemsMapper.toEntity(prSalaryItemsDTO);
         prSalaryItems = prSalaryItemsRepository.save(prSalaryItems);
         PrSalaryItemsDTO result = prSalaryItemsMapper.toDto(prSalaryItems);
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                result.getUpdatedBy(),
+                "payroll",
+                ENTITY_NAME,
+                result.getId().toString(),
+                Action.PUT
+            )
+        );
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, prSalaryItemsDTO.getId().toString()))
             .body(result);
@@ -139,7 +166,18 @@ public class PrSalaryItemsResource {
     @Timed
     public ResponseEntity<Void> deletePrSalaryItems(@PathVariable Long id) {
         log.debug("REST request to delete PrSalaryItems : {}", id);
+        PrSalaryItems salaryItems = prSalaryItemsRepository.findOne(id);
+        PrSalaryItemsDTO salaryItemsDTO = prSalaryItemsMapper.toDto(salaryItems);
         prSalaryItemsRepository.delete(id);
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                salaryItemsDTO.getUpdatedBy(),
+                "payroll",
+                ENTITY_NAME,
+                id.toString(),
+                Action.DELETE
+            )
+        );
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

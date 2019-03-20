@@ -1,10 +1,12 @@
 package ba.infostudio.com.web.rest;
 
+import ba.infostudio.com.domain.Action;
 import ba.infostudio.com.repository.PrEmpSalariesRepository;
 import ba.infostudio.com.repository.PrEmpSalarySettingsRepository;
 import ba.infostudio.com.service.PrPayrollSettingsService;
 import ba.infostudio.com.service.RestResponse;
 import ba.infostudio.com.service.UserPayrollComposition;
+import ba.infostudio.com.web.rest.util.AuditUtil;
 import com.codahale.metrics.annotation.Timed;
 import ba.infostudio.com.domain.PrPayrollSettings;
 
@@ -17,6 +19,7 @@ import ba.infostudio.com.service.mapper.PrPayrollSettingsMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -54,16 +57,20 @@ public class PrPayrollSettingsResource {
 
     private final PrPayrollSettingsService prPayrollSettingsService;
 
+    private final ApplicationEventPublisher applicationEventPublisher;
+
     public PrPayrollSettingsResource(PrPayrollSettingsRepository prPayrollSettingsRepository,
                                      PrEmpSalarySettingsRepository prEmpSalarySettingsRepository,
                                      PrEmpSalariesRepository prEmpSalariesRepository,
                                      PrPayrollSettingsMapper prPayrollSettingsMapper,
-                                     PrPayrollSettingsService prPayrollSettingsService) {
+                                     PrPayrollSettingsService prPayrollSettingsService,
+                                     ApplicationEventPublisher applicationEventPublisher) {
         this.prPayrollSettingsRepository = prPayrollSettingsRepository;
         this.prPayrollSettingsMapper = prPayrollSettingsMapper;
         this.prEmpSalariesRepository = prEmpSalariesRepository;
         this.prEmpSalarySettingsRepository = prEmpSalarySettingsRepository;
         this.prPayrollSettingsService = prPayrollSettingsService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
 
@@ -148,6 +155,15 @@ public class PrPayrollSettingsResource {
         PrPayrollSettings prPayrollSettings = prPayrollSettingsMapper.toEntity(prPayrollSettingsDTO);
         prPayrollSettings = prPayrollSettingsRepository.save(prPayrollSettings);
         PrPayrollSettingsDTO result = prPayrollSettingsMapper.toDto(prPayrollSettings);
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                result.getCreatedBy(),
+                "payroll",
+                ENTITY_NAME,
+                result.getId().toString(),
+                Action.POST
+            )
+        );
         return ResponseEntity.created(new URI("/api/pr-payroll-settings/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -176,6 +192,15 @@ public class PrPayrollSettingsResource {
         PrPayrollSettings prPayrollSettings = prPayrollSettingsMapper.toEntity(prPayrollSettingsDTO);
         prPayrollSettings = prPayrollSettingsRepository.save(prPayrollSettings);
         PrPayrollSettingsDTO result = prPayrollSettingsMapper.toDto(prPayrollSettings);
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                result.getUpdatedBy(),
+                "payroll",
+                ENTITY_NAME,
+                result.getId().toString(),
+                Action.PUT
+            )
+        );
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, prPayrollSettingsDTO.getId().toString()))
             .body(result);
@@ -256,6 +281,9 @@ public class PrPayrollSettingsResource {
     @PostMapping("/pr-payroll-settings/delete-payrolls")
     @Timed
     public ResponseEntity<RestResponse> deletePayrolls(@RequestBody UserPayrollComposition userPayrollComposition){
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent("Obračun plata obrisan")
+        );
         return generatePayrollUtil(userPayrollComposition, GenerationType.OBRISI_OBRACUN_PLATA,
             "delete-payrolls", "payrollsDeleted");
     }
@@ -267,6 +295,9 @@ public class PrPayrollSettingsResource {
     @Timed
     public ResponseEntity<RestResponse> generatePayrolls(@RequestBody UserPayrollComposition userPayrollComposition){
         log.debug("PAYROLL {}", userPayrollComposition);
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent("Obračun plata generisan")
+        );
         return generatePayrollUtil(userPayrollComposition, GenerationType.OBRACUN_PLATA,
             "generate-payrolls", "payrollsNotGenerated");
     }
@@ -275,6 +306,9 @@ public class PrPayrollSettingsResource {
     @PostMapping("/pr-payroll-settings/generate-payroll-suggestion")
     @Timed
     public ResponseEntity<RestResponse> generatePayrollSuggestion(@RequestBody UserPayrollComposition userPayrollComposition){
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent("Prijedlog obračuna plata generisan")
+        );
         return generatePayrollUtil(userPayrollComposition, GenerationType.PRIJEDLOG_PLATA,
             "generate-payroll-suggestion", "payrollSuggestionNotGenerated");
     }
@@ -330,9 +364,20 @@ public class PrPayrollSettingsResource {
     @Timed
     public ResponseEntity<Void> deletePrPayrollSettings(@PathVariable Long id) {
         log.debug("REST request to delete PrPayrollSettings : {}", id);
+        PrPayrollSettings prPayrollSettings = prPayrollSettingsRepository.findOne(id);
+        PrPayrollSettingsDTO prPayrollSettingsDTO = prPayrollSettingsMapper.toDto(prPayrollSettings);
         prEmpSalariesRepository.deleteAllByPayrollSettingsId(id);
         prEmpSalarySettingsRepository.deleteAllByPayrollSettingsId(id);
         prPayrollSettingsRepository.delete(id);
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                prPayrollSettingsDTO.getUpdatedBy(),
+                "payroll",
+                ENTITY_NAME,
+                id.toString(),
+                Action.DELETE
+            )
+        );
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

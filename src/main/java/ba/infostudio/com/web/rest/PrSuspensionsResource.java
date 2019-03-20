@@ -1,5 +1,7 @@
 package ba.infostudio.com.web.rest;
 
+import ba.infostudio.com.domain.Action;
+import ba.infostudio.com.web.rest.util.AuditUtil;
 import org.apache.commons.lang.RandomStringUtils;
 
 import com.codahale.metrics.annotation.Timed;
@@ -14,6 +16,7 @@ import ba.infostudio.com.service.mapper.PrSuspensionsMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -43,9 +46,14 @@ public class PrSuspensionsResource {
 
     private final PrSuspensionsMapper prSuspensionsMapper;
 
-    public PrSuspensionsResource(PrSuspensionsRepository prSuspensionsRepository, PrSuspensionsMapper prSuspensionsMapper) {
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    public PrSuspensionsResource(PrSuspensionsRepository prSuspensionsRepository,
+                                 PrSuspensionsMapper prSuspensionsMapper,
+                                 ApplicationEventPublisher applicationEventPublisher) {
         this.prSuspensionsRepository = prSuspensionsRepository;
         this.prSuspensionsMapper = prSuspensionsMapper;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     /**
@@ -70,6 +78,15 @@ public class PrSuspensionsResource {
         PrSuspensions prSuspensions = prSuspensionsMapper.toEntity(prSuspensionsDTO);
         prSuspensions = prSuspensionsRepository.save(prSuspensions);
         PrSuspensionsDTO result = prSuspensionsMapper.toDto(prSuspensions);
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                result.getCreatedBy(),
+                "payroll",
+                ENTITY_NAME,
+                result.getId().toString(),
+                Action.POST
+            )
+        );
         return ResponseEntity.created(new URI("/api/pr-suspensions/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -94,6 +111,15 @@ public class PrSuspensionsResource {
         PrSuspensions prSuspensions = prSuspensionsMapper.toEntity(prSuspensionsDTO);
         prSuspensions = prSuspensionsRepository.save(prSuspensions);
         PrSuspensionsDTO result = prSuspensionsMapper.toDto(prSuspensions);
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                result.getUpdatedBy(),
+                "payroll",
+                ENTITY_NAME,
+                result.getId().toString(),
+                Action.PUT
+            )
+        );
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, prSuspensionsDTO.getId().toString()))
             .body(result);
@@ -139,7 +165,18 @@ public class PrSuspensionsResource {
     @Timed
     public ResponseEntity<Void> deletePrSuspensions(@PathVariable Long id) {
         log.debug("REST request to delete PrSuspensions : {}", id);
+        PrSuspensions suspensions = prSuspensionsRepository.findOne(id);
+        PrSuspensionsDTO suspensionsDTO = prSuspensionsMapper.toDto(suspensions);
         prSuspensionsRepository.delete(id);
+        applicationEventPublisher.publishEvent(
+            AuditUtil.createAuditEvent(
+                suspensionsDTO.getUpdatedBy(),
+                "payroll",
+                ENTITY_NAME,
+                id.toString(),
+                Action.DELETE
+            )
+        );
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }
